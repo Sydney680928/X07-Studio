@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFrameworks>net7.0-windows</TargetFrameworks>
+		<UseWindowsForms>true</UseWindowsForms>
+		<PackageId>ICSharpCode.TextEditorEx</PackageId>
+		<Copyright>Copyright © Stef Heyenrath, SharpDevelop, Qwertie and MysticBoy 2014-2020</Copyright>
+		<Version>1.1.0</Version>
+		<PackageProjectUrl>https://github.com/StefH/ICSharpCode.TextEditorEx</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/StefH/ICSharpCode.TextEditorEx</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>TextEditor;ICSharpCode</PackageTags>
+		<Authors>Stef Heyenrath, SharpDevelop, Qwertie and MysticBoy</Authors>
+		<PackageLicenseFile></PackageLicenseFile>
+		<RootNamespace>ICSharpCode.TextEditor</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+		<Reference Include="System.Windows.Forms" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Resources\*.*" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,141 @@
+﻿<?xml version="1.0"?>
+<!-- syntaxdefinition for X07 -->
+
+<SyntaxDefinition name = "Z80" extensions = ".z80">
+
+    <Digits name="Digits" bold="false" italic="false" color="Black"/>
+
+    <RuleSets>
+
+		<RuleSet ignorecase = "false">
+
+			<Delimiters>*()-+=|#/:;"&lt;&gt;,</Delimiters>
+
+			<Span name="String" bold="false" italic="false" color="Green" stopateol="false" escapecharacter="\">
+				<Begin>"</Begin>
+				<End>"</End>
+			</Span>
+			
+			<Span name = "COMMENT" bold = "false" italic = "true" color = "Gray" stopateol = "true">
+				<Begin singleword="false">//</Begin>
+			</Span>
+
+			<Span name = "LABEL" bold = "false" italic = "true" color = "Green" stopateol = "true">
+				<Begin singleword="true">@@</Begin>
+			</Span>
+
+			<Span name ="DIRECTIVES" bold="false" italic = "false" color = "Green" stopateol ="true">
+				<Begin>#</Begin>
+			</Span>
+
+			<KeyWords name="COMMANDS" bold="true" italic="false" color="Blue">
+				<Key word="DATA" />
+				<Key word="DEFB" />
+				<Key word="DEFW" />
+				<Key word="ORG" />
+			</KeyWords>
+
+			<KeyWords name="REGISTERS" bold="false" italic="false" color="Red">
+				<Key word="A" />
+				<Key word="B" />
+				<Key word="C" />
+				<Key word="D" />
+				<Key word="E" />
+				<Key word="F" />
+				<Key word="H" />
+				<Key word="L" />
+				<Key word="AF" />
+				<Key word="AF'" />
+				<Key word="BC" />
+				<Key word="DE" />
+				<Key word="HL" />
+				<Key word="IX" />
+				<Key word="IY" />
+				<Key word="SP" />
+			</KeyWords>
+
+			<KeyWords name="FLAGS" bold="false" italic="false" color="Red">
+				<Key word="NZ" />
+				<Key word="C" />
+				<Key word="NC" />
+				<Key word="NZ" />
+				<Key word="P" />
+				<Key word="PE" />
+				<Key word="PO" />
+				<Key word="Z" />
+				<Key word="M" />
+			</KeyWords>
+
+			<KeyWords name = "OPERATIONS" bold="false" italic="false" color="Blue">
+				<Key word = "ADC" />
+				<Key word = "ADD" />
+				<Key word = "AND" />
+				<Key word = "BIT" />
+				<Key word = "CALL" />
+				<Key word = "CCF" />
+				<Key word = "CP" />
+				<Key word = "CPD" />
+				<Key word = "CPDR" />
+				<Key word = "CPI" />
+				<Key word = "CPIR" />
+				<Key word = "CPL" />
+				<Key word = "DEC" />
+				<Key word = "DI" />
+				<Key word = "DJNZ" />
+				<Key word = "EI" />
+				<Key word = "EX" />
+				<Key word = "EXX" />
+				<Key word = "HALT" />
+				<Key word = "IM" />
+				<Key word = "IN" />
+				<Key word = "INC" />
+				<Key word = "IND" />
+				<Key word = "INDR" />
+				<Key word = "INI" />
+				<Key word = "INIR" />
+				<Key word = "JP" />
+				<Key word = "JR" />
+				<Key word = "LD" />
+				<Key word = "LDD" />
+				<Key word = "LDIR" />
+				<Key word = "NEG" />
+				<Key word = "NOP" />
+				<Key word = "OR" />
+				<Key word = "OTDR" />
+				<Key word = "OTIR" />
+				<Key word = "OUT" />
+				<Key word = "OUTD" />
+				<Key word = "OUTI" />
+				<Key word = "POP" />
+				<Key word = "PUSH" />
+				<Key word = "RES" />
+				<Key word = "RET" />
+				<Key word = "RETI" />
+				<Key word = "RETN" />
+				<Key word = "RL" />
+				<Key word = "RLA" />
+				<Key word = "RLC" />
+				<Key word = "RLCA" />
+				<Key word = "RLD" />
+				<Key word = "RR" />
+				<Key word = "RRA" />
+				<Key word = "RRCA" />
+				<Key word = "RRC" />
+				<Key word = "RRD" />
+				<Key word = "RST" />
+				<Key word = "SBC" />
+				<Key word = "SCF" />
+				<Key word = "SET" />
+				<Key word = "SLA" />
+				<Key word = "SRA" />
+				<Key word = "SRL" />
+				<Key word = "SUB" />
+				<Key word = "XOR" />
+			</KeyWords>
+
+		</RuleSet>
+		
+    </RuleSets>
+	
+</SyntaxDefinition>
+

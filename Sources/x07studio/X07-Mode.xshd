@@ -1,0 +1,171 @@
+﻿<?xml version="1.0"?>
+<!-- syntaxdefinition for X07 -->
+
+<SyntaxDefinition name = "X07" extensions = ".bas">
+
+    <Digits name="Digits" bold="false" italic="false" color="Black"/>
+
+    <RuleSets>
+
+		<RuleSet ignorecase = "false">
+
+			<Delimiters>*()-+=|#/:;"&lt;&gt;,</Delimiters>
+			
+			<Span name = "COMMENT" bold = "false" italic = "false" color = "Gray" stopateol = "true">
+				<Begin singleword="true">REM </Begin>
+			</Span>
+
+			<Span name = "COMMENT2" bold = "false" italic = "true" color = "Green" stopateol = "true">
+				<Begin singleword="true">//</Begin>
+			</Span>
+
+			<Span name = "DIRECT" bold = "false" italic = "true" color = "Green" stopateol = "true">
+				<Begin singleword="true">#IMPORT </Begin>
+				<End>@ </End>
+			</Span>
+
+			<Span name = "VARS" bold = "false" italic = "true" color = "DarkOrchid" stopateol = "true">
+				<Begin singleword="true">#VAR </Begin>
+				<End>@ </End>
+			</Span>
+
+			<Span name = "VARS" bold = "false" italic = "true" color = "SaddleBrown" stopateol = "true">
+				<Begin singleword="true">#DEF </Begin>
+				<End>@ </End>
+			</Span>
+
+            <Span name="String" bold="false" italic="false" color="Green" stopateol="false" escapecharacter="\">
+                <Begin>"</Begin>
+                <End>"</End>
+            </Span>
+			
+			<Span name = "LabelUsage" bold = "false" italic = "true" color = "Green" stopateol = "true">
+				<Begin>@@</Begin>
+				<End>:</End>
+			</Span>
+
+            <KeyWords name = "basic_instructions" bold="false" italic="false" color="Blue">
+                <Key word = "BEEP" />
+                <Key word = "CIRCLE" />
+                <Key word = "CLEAR" />
+                <Key word = "CLOAD" />
+                <Key word = "CLOAD?" />
+	            <Key word = "CLS" />
+	            <Key word = "CONSOLE" />
+                <Key word = "CONT" />
+                <Key word = "CSAVE" />
+                <Key word = "DATA" />
+				<Key word = "DEFFN" />
+				<Key word = "DEFINT" />
+				<Key word = "DEFSNG" />
+				<Key word = "DEFDBL" />
+				<Key word = "DEFSTR" />
+				<Key word = "DELETE" />
+				<Key word = "DIM" />
+				<Key word = "DIR" />
+				<Key word = "END" />
+				<Key word = "ERASE" />
+				<Key word = "ERROR" />
+				<Key word = "EXEC" />
+				<Key word = "FOR" />
+				<Key word = "TO" />
+				<Key word = "STEP" />
+				<Key word = "FSET" />
+				<Key word = "GOSUB" />
+				<Key word = "GOTO" />
+				<Key word = "IF" />		
+				<Key word = "THEN" />
+				<Key word = "ELSE" />
+				<Key word = "INIT" />
+				<Key word = "INPUT" />
+				<Key word = "LET" />
+				<Key word = "LINE" />
+				<Key word = "LIST" />
+				<Key word = "LLIST" />
+				<Key word = "LOAD" />
+				<Key word = "LOAD?" />
+				<Key word = "LOCATE" />
+				<Key word = "LPRINT" />
+				<Key word = "MOTOR" />
+				<Key word = "NEW" />
+				<Key word = "NEXT" />		
+				<Key word = "OFF" />
+				<Key word = "ERROR" />
+				<Key word = "ON" />
+				<Key word = "OUT" />
+				<Key word = "POKE" />
+				<Key word = "PRESET" />
+				<Key word = "PRINT" />
+				<Key word = "USING" />
+				<Key word = "PSET" />
+				<Key word = "READ" />						
+				<Key word = "REM" />	
+				<Key word = "RESTORE" />
+				<Key word = "RESUME" />
+				<Key word = "RETURN" />
+				<Key word = "RUN" />
+				<Key word = "SAVE" />
+				<Key word = "SLEEP" />
+				<Key word = "STOP" />
+				<Key word = "TROFF" />
+				<Key word = "TRON" />
+            </KeyWords>
+
+			<KeyWords name = "basic_functions" bold="false" italic="false" color="Firebrick">
+				<Key word = "ABS" />
+				<Key word = "ALM$" />
+				<Key word = "ASC" />
+				<Key word = "ATN" />
+				<Key word = "CDBL" />
+				<Key word = "CHR$" />
+				<Key word = "CINT" />
+				<Key word = "COS" />
+				<Key word = "CSNG" />
+				<Key word = "CSRLIN" />
+				<Key word = "DATE$" />
+				<Key word = "ERL" />
+				<Key word = "ERR" />
+				<Key word = "EXP" />
+				<Key word = "FIX" />
+				<Key word = "FONT$" />
+				<Key word = "FRE" />
+				<Key word = "HEX$" />
+				<Key word = "INKEY$" />
+				<Key word = "INP" />
+				<Key word = "INSTR" />
+				<Key word = "INT" />
+				<Key word = "KEY$" />
+				<Key word = "LEFT$" />
+				<Key word = "LEN" />
+				<Key word = "LOG" />
+				<Key word = "MID$" />
+				<Key word = "PEEK" />
+				<Key word = "POINT" />
+				<Key word = "POS" />
+				<Key word = "RIGHT$" />
+				<Key word = "RND" />
+				<Key word = "SCREEN" />
+				<Key word = "SNG" />
+				<Key word = "SIN" />
+				<Key word = "SNS" />
+				<Key word = "SQR" />
+				<Key word = "START$" />
+				<Key word = "STICK" />
+				<Key word = "STR$" />
+				<Key word = "STRIG" />
+				<Key word = "STRING$" />
+				<Key word = "TAB" />
+				<Key word = "TAN" />
+				<Key word = "TIME$" />
+				<Key word = "TKEY" />
+				<Key word = "USR" />
+				<Key word = "VAL" />
+				<Key word = "VARPTR" />
+			</KeyWords>
+
+		</RuleSet>
+		
+    </RuleSets>
+	
+</SyntaxDefinition>
+
