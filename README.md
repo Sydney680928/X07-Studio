@@ -1,5 +1,10 @@
 # X07-Studio
-Editor and tools for programming the CANON X-07
+
+**Editor and tools for programming the CANON X-07** <br />
+
+![Alt text](./Images/x07_img30.jpg?raw=true "CANON X-07") <br />
+
+<br />
 
 More informations at https://coding4phone.com/?p=1044
 
