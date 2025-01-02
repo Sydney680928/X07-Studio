@@ -260,6 +260,17 @@ namespace x07studio.Classes
                 }
             }
 
+            // On remplace les définitions ASCII par les caractères correspondants
+
+            foreach (var line in exports)
+            {
+                for (int i = 0; i < 256; i++)
+                {
+                    var s = new string((char)i, 1);
+                    line.BasicLine = line.BasicLine.Replace($"(${i})", s);
+                }
+            }
+
             // S'il reste à l'issue des @... présents dans le code c'est qu'on a utilisé des noms de labels erronés
             // Et ils n'ont pas été remplacés
 

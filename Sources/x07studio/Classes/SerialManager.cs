@@ -115,15 +115,13 @@ namespace x07studio.Classes
         {
             if (_SerialPort != null && _SerialPort.IsOpen)
             {
-                for (int i = 0; i < command.Length; i++)
-                {
-                    var s = command[i];
-                    _SerialPort.Write([s], 0, 1);
-                    //Thread.Sleep(50);
-                }
+                var bytes = Encoding.Unicode.GetBytes(command);
+                var b2 = new byte[bytes.Length / 2];
+                int i, j;
+                for (i = 0, j = 0; i < bytes.Length; i += 2, j++) b2[j] = bytes[i];
 
+                _SerialPort.Write(b2, 0, b2.Length);
                 _SerialPort.Write("\r");
-                //Thread.Sleep(200);
             }
         }
 
