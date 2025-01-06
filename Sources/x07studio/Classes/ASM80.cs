@@ -1256,9 +1256,9 @@ namespace x07studio.Classes
 
             AddDefinition("LD I,A", "ED47");
             AddDefinition("LD IX,(H1H2)", "DD2AH2H1");
-            AddDefinition("LD IX,H2H1", "DD21H2H1");
+            AddDefinition("LD IX,H1H2", "DD21H2H1");
             AddDefinition("LD IY,(H1H2)", "FD2AH2H1");
-            AddDefinition("LD IY,H2H1", "FD21H2H1");
+            AddDefinition("LD IY,H1H2", "FD21H2H1");
 
             AddDefinition("LD L,(HL)", "6E");
             AddDefinition("LD L,(IX+V0)", "DD6EV0");
