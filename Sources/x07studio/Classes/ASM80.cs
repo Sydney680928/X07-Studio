@@ -276,7 +276,7 @@ namespace x07studio.Classes
 
                     // Erreur !!!
 
-                    Debug.WriteLine($"DEFB NON VALIDE ! - {line}");
+                    Debug.WriteLine($"DEFW NON VALIDE ! - {line}");
 
                 }
                 else if (line.StartsWith("ORG "))
@@ -443,7 +443,7 @@ namespace x07studio.Classes
 
                                 if (operation.Parameter == "H1H2")
                                 {
-                                    // On attend une valeur décimal
+                                    // On attend une valeur décimale
 
                                     if (ushort.TryParse(pValue, out var v16))
                                     {
