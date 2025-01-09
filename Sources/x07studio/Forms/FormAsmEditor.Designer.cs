@@ -39,12 +39,12 @@
             FileSaveMenu = new ToolStripMenuItem();
             FileSaveAsMenu = new ToolStripMenuItem();
             CompileMenu = new ToolStripMenuItem();
+            CreateLoaderMenu = new ToolStripMenuItem();
             CodeEditor = new ICSharpCode.TextEditor.TextEditorControl();
             AsmEditorTab = new TabControl();
             CodePage = new TabPage();
             ComputerPage = new TabPage();
             AsmListView = new ListView();
-            CreateLoaderMenu = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
             Column0 = new ColumnHeader();
             Column1 = new ColumnHeader();
@@ -108,6 +108,13 @@
             CompileMenu.Size = new Size(68, 20);
             CompileMenu.Text = "Compiler";
             CompileMenu.Click += CompileMenu_Click;
+            // 
+            // CreateLoaderMenu
+            // 
+            CreateLoaderMenu.Name = "CreateLoaderMenu";
+            CreateLoaderMenu.Size = new Size(110, 20);
+            CreateLoaderMenu.Text = "Générer chargeur";
+            CreateLoaderMenu.Click += CreateLoaderMenu_Click;
             // 
             // Column0
             // 
@@ -192,13 +199,6 @@
             AsmListView.TabIndex = 0;
             AsmListView.UseCompatibleStateImageBehavior = false;
             AsmListView.View = View.Details;
-            // 
-            // CreateLoaderMenu
-            // 
-            CreateLoaderMenu.Name = "CreateLoaderMenu";
-            CreateLoaderMenu.Size = new Size(110, 20);
-            CreateLoaderMenu.Text = "Générer chargeur";
-            CreateLoaderMenu.Click += CreateLoaderMenu_Click;
             // 
             // FormAsmEditor
             // 

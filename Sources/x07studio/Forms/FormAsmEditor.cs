@@ -1,4 +1,5 @@
-﻿using ICSharpCode.TextEditor.Document;
+﻿using ICSharpCode.TextEditor;
+using ICSharpCode.TextEditor.Document;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -101,6 +102,24 @@ namespace x07studio.Forms
             }
 
             return true;
+        }
+
+        public void SelectLine(int lineNumber)
+        {
+            try
+            {
+                CodeEditor.ActiveTextAreaControl.SelectionManager.ClearSelection();
+
+                var startLocation = new TextLocation(0, lineNumber - 1);
+                var endLocation = new TextLocation(80, lineNumber - 1);
+
+                CodeEditor.ActiveTextAreaControl.SelectionManager.SetSelection(startLocation, endLocation);
+                CodeEditor.ActiveTextAreaControl.ScrollTo(endLocation.Line, endLocation.Column);
+            }
+            catch
+            {
+
+            }
         }
 
         private void FileNewMenu_Click(object sender, EventArgs e)
@@ -310,7 +329,9 @@ namespace x07studio.Forms
                 sb.AppendLine($"Ligne {_CurrentAssembleResult.ErrorLine + 1}");
                 sb.AppendLine(_CurrentAssembleResult.ErrorCode);
 
-                MessageBox.Show(sb.ToString(), "X07 STUDIO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(this,sb.ToString(), "X07 STUDIO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+
+                SelectLine(_CurrentAssembleResult.ErrorLine + 1);
             }
         }
 
