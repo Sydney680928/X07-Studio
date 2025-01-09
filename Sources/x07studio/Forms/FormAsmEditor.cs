@@ -18,7 +18,7 @@ namespace x07studio.Forms
         private string? _CurrentProgramFilename;
         private bool _CodeIsModified;
         private ASM80 _ASM80 = new();
-        private List<ASM80.OutLine>? _CurrentComputerCode;
+        private ASM80.AssembleResult? _CurrentAssembleResult;
 
         public FormAsmEditor()
         {
@@ -112,7 +112,7 @@ namespace x07studio.Forms
                 CodeEditor.Refresh();
                 _CodeIsModified = false;
                 UpdateTitleFromProgram();
-                _CurrentComputerCode = null;
+                _CurrentAssembleResult = null;
                 AsmListView.Items.Clear();
                 AsmEditorTab.SelectedTab = CodePage;
             }
@@ -256,7 +256,7 @@ namespace x07studio.Forms
                 var code = reader.ReadToEnd();
                 CodeEditor.Text = code;
                 CodeEditor.Refresh();
-                _CurrentComputerCode = null;
+                _CurrentAssembleResult = null;
                 AsmListView.Items.Clear();
                 AsmEditorTab.SelectedTab = CodePage;
                 return true;
@@ -284,15 +284,15 @@ namespace x07studio.Forms
         {
             AsmListView.Items.Clear();
 
-            _CurrentComputerCode = _ASM80.Assemble(CodeEditor.Text);
+            _CurrentAssembleResult = _ASM80.Assemble(CodeEditor.Text);
 
-            if (_CurrentComputerCode != null)
+            if (_CurrentAssembleResult.Status == ASM80.AssembleResultStatusEnum.Success)
             {
-                for (int i = 0; i < _CurrentComputerCode.Count; i++)
+                for (int i = 0; i < _CurrentAssembleResult.Outlines.Count; i++)
                 {
-                    if (_CurrentComputerCode[i].Hexa.Length > 0)
+                    if (_CurrentAssembleResult.Outlines[i].Hexa.Length > 0)
                     {
-                        var item = new AsmListViewItem(_CurrentComputerCode[i]);
+                        var item = new AsmListViewItem(_CurrentAssembleResult.Outlines[i]);
                         AsmListView.Items.Add(item);
                     }
                 }
@@ -301,13 +301,24 @@ namespace x07studio.Forms
 
                 AsmEditorTab.SelectedTab = ComputerPage;
             }
+            else
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("Une erreur est survenue !");
+                sb.AppendLine();
+                sb.AppendLine(_CurrentAssembleResult.ErrorMessage);
+                sb.AppendLine($"Ligne {_CurrentAssembleResult.ErrorLine + 1}");
+                sb.AppendLine(_CurrentAssembleResult.ErrorCode);
+
+                MessageBox.Show(sb.ToString(), "X07 STUDIO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
         }
 
         private void CreateLoaderMenu_Click(object sender, EventArgs e)
         {
-            if (_CurrentComputerCode != null)
+            if (_CurrentAssembleResult != null)
             {
-                var code = _ASM80.CreateBasicLoader(_CurrentComputerCode);
+                var code = _ASM80.CreateBasicLoader(_CurrentAssembleResult.Outlines);
 
                 var name = "";
 

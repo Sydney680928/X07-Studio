@@ -23,7 +23,7 @@ namespace x07studio.Classes
             MakeDefinitions();
         }
 
-        public List<OutLine>? Assemble(string code)
+        public AssembleResult Assemble(string code)
         {
             Debug.WriteLine("");
             Debug.WriteLine(code);
@@ -74,7 +74,7 @@ namespace x07studio.Classes
                             c == '-'))
                         {
                             Debug.WriteLine($"NOM DE LABEL INVALIDE ! - {line}");
-                            return null;
+                            return new AssembleResult(i, "NOM DE LABEL INVALIDE !", line);
                         }
                     }
 
@@ -85,8 +85,8 @@ namespace x07studio.Classes
                 else if (line.StartsWith("DATA "))
                 {
                     var values = line.Substring(5);
-                    var items = DispatchValues(values); 
-                    
+                    var items = DispatchValues(values);
+
                     if (items.Count > 0)
                     {
                         // On prépare un hexa composé des valeurs 
@@ -137,7 +137,7 @@ namespace x07studio.Classes
                                             // On doit inverser H1 et H2
 
                                             var h16 = v.ToString("X4");
-                                            sbhexa.Append(h16.Substring(2,2));
+                                            sbhexa.Append(h16.Substring(2, 2));
                                             sbhexa.Append(h16.Substring(0, 2));
                                         }
                                     }
@@ -146,7 +146,7 @@ namespace x07studio.Classes
                                         // Nombre hexa non valide
 
                                         Debug.WriteLine($"DATA INCORRECT ! - {line}");
-                                        return null;
+                                        return new AssembleResult(i, "DATA INCORRECT !", line);
                                     }
                                 }
                                 else
@@ -178,7 +178,7 @@ namespace x07studio.Classes
                                         // Nombre décimal non valide
 
                                         Debug.WriteLine($"DATA INCORRECT ! - {line}");
-                                        return null;
+                                        return new AssembleResult(i, "DATA INCORRECT !", line);
                                     }
                                 }
                             }
@@ -189,7 +189,7 @@ namespace x07studio.Classes
                         if (sbhexa.Length > 256)
                         {
                             Debug.WriteLine($"DATA TROP LONG ! - {line}");
-                            return null;
+                            return new AssembleResult(i, "DATA TROP LONG !", line);
                         }
 
                         var hexa = sbhexa.ToString();
@@ -198,17 +198,18 @@ namespace x07studio.Classes
 
                         var outLine = new OutLine
                             (pc,
+                            i,
                             $"DATA x ${hexa.Length.ToString("X2")}",
                             hexa, null,
                             null);
-                        
+
                         outLines.Add(outLine);
-                        pc += (ushort) (hexa.Length / 2);
+                        pc += (ushort)(hexa.Length / 2);
                     }
                     else
                     {
                         Debug.WriteLine($"DATA NON VALIDE ! - {line}");
-                        return null;
+                        return new AssembleResult(i, "DATA NON VALIDE !", line);
                     }
                 }
                 else if (line.StartsWith("DEFB "))
@@ -243,7 +244,7 @@ namespace x07studio.Classes
                     // Erreur !!!
 
                     Debug.WriteLine($"DEFB NON VALIDE ! - {line}");
-
+                    return new AssembleResult(i, "DEFB NON VALIDE !", line);
                 }
                 else if (line.StartsWith("DEFW "))
                 {
@@ -277,6 +278,7 @@ namespace x07studio.Classes
                     // Erreur !!!
 
                     Debug.WriteLine($"DEFW NON VALIDE ! - {line}");
+                    return new AssembleResult(i, "DEFW NON VALIDE !", line);
 
                 }
                 else if (line.StartsWith("ORG "))
@@ -287,14 +289,14 @@ namespace x07studio.Classes
                     {
                         if (ushort.TryParse(addr.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var a))
                         {
-                            pc = a;                    
+                            pc = a;
                         }
                         else
                         {
                             // ORG NON VALIDE !
 
                             Debug.WriteLine("ORG NON VALIDE !");
-                            return null;
+                            return new AssembleResult(i, "ORG NON VALIDE !", line);
                         }
                     }
                     else
@@ -308,12 +310,13 @@ namespace x07studio.Classes
                             // ORG NON VALIDE !
 
                             Debug.WriteLine("ORG NON VALIDE !");
-                            return null;
+                            return new AssembleResult(i, "ORG NON VALIDE !", line);
                         }
                     }
 
                     var outLine = new OutLine(
                                 pc,
+                                i,
                                 "ORG",
                                 "",
                                 null,
@@ -338,8 +341,8 @@ namespace x07studio.Classes
                         {
                             // CONSTANTE INTROUVABLE !!!
 
-                            Debug.WriteLine($"ERREUR - CONSTANTE INTROUVABLE - {line} !");
-                            return null;
+                            Debug.WriteLine($"CONSTANTE INTROUVABLE ! - {line}");
+                            return new AssembleResult(i, "CONSTANTE INTROUVABLE !", line);
                         }
                     }
 
@@ -352,7 +355,7 @@ namespace x07studio.Classes
                         // OPERATION INTROUVABLE !!!
 
                         Debug.WriteLine($"ERREUR - OPERATION INTROUVABLE - {line} !");
-                        return null;
+                        return new AssembleResult(i, "OPERATION INTROUVABLE !", line);
                     }
                     else
                     {
@@ -397,11 +400,11 @@ namespace x07studio.Classes
                                 // Valeur en hexa à convertir en X2 ou X4 suivant le type de paramètre attendu
                                 // H1H2 ou V0
 
-                                if (operation.Parameter =="H1H2")
+                                if (operation.Parameter == "H1H2")
                                 {
                                     // On attend une valeur hexa sur 16 bits
 
-                                    if (ushort.TryParse(pValue.Substring(1), System.Globalization.NumberStyles.HexNumber,null, out var v16))
+                                    if (ushort.TryParse(pValue.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var v16))
                                     {
                                         pValue = v16.ToString("X4");
                                         var newLine = line.Substring(0, pValueStart) + pValue;
@@ -413,8 +416,8 @@ namespace x07studio.Classes
                                         // Conversion impossible !
 
                                         Debug.WriteLine($"ERREUR - ERREUR CONVERSION HEXA 16 BITS - {line} !");
-                                        return null;
-                                    }                                   
+                                        return new AssembleResult(i, "ERREUR CONVERSION HEXA 16 BITS !", line);
+                                    }
                                 }
                                 else if (operation.Parameter == "V0")
                                 {
@@ -432,7 +435,7 @@ namespace x07studio.Classes
                                         // Conversion impossible !
 
                                         Debug.WriteLine($"ERREUR - ERREUR CONVERSION HEXA 8 BITS - {line} !");
-                                        return null;
+                                        return new AssembleResult(i, "ERREUR CONVERSION HEXA 8 BITS !", line);
                                     }
                                 }
                             }
@@ -457,7 +460,7 @@ namespace x07studio.Classes
                                         // Conversion impossible !
 
                                         Debug.WriteLine($"ERREUR - ERREUR CONVERSION DECIMAL VERS HEXA 16 BITS - {line} !");
-                                        return null;
+                                        return new AssembleResult(i, "ERREUR CONVERSION DECIMAL VERS HEXA 16 BITS !", line);
                                     }
                                 }
                                 else if (operation.Parameter == "V0")
@@ -476,18 +479,19 @@ namespace x07studio.Classes
                                         // Conversion impossible !
 
                                         Debug.WriteLine($"ERREUR - ERREUR CONVERSION DECIMAL VERS HEXA 8 BITS - {line} !");
-                                        return null;
+                                        return new AssembleResult(i, "ERREUR CONVERSION DECIMAL VERS HEXA 8 BITS !", line);
                                     }
                                 }
                             }
 
                             var outLine = new OutLine(
-                                pc, 
-                                line, 
-                                operation.Hexa, 
-                                operation, 
+                                pc,
+                                i,
+                                line,
+                                operation.Hexa,
+                                operation,
                                 labelName);
-                            
+
                             outLines.Add(outLine);
                         }
                         else
@@ -496,12 +500,13 @@ namespace x07studio.Classes
                             // On peut tout de suite ajouter la ligne
 
                             var outLine = new OutLine(
-                                pc, 
-                                line, 
-                                operation.Hexa, 
-                                operation, 
+                                pc,
+                                i,
+                                line,
+                                operation.Hexa,
+                                operation,
                                 null);
-                             
+
                             outLines.Add(outLine);
                         }
 
@@ -544,7 +549,7 @@ namespace x07studio.Classes
                             else
                             {
                                 Debug.WriteLine($"LABEL INTROUVABLE ! - {line}");
-                                return null;
+                                return new AssembleResult(item.CodeLineNumber, "LABEL INTROUVABLE !", line);
                             }
                         }
 
@@ -562,7 +567,7 @@ namespace x07studio.Classes
                                 // la partie paramètre n'est pas de la bonne taille !!!
 
                                 Debug.WriteLine($"ERREUR - PARTIE VARIABLE INCORRECTE ! - {line}");
-                                return null;
+                                return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
                             }
                             else
                             {
@@ -583,9 +588,10 @@ namespace x07studio.Classes
                                     hexa = hexa.Replace("H2", h2);
 
                                     var outLine = new OutLine(
-                                        item.Address, 
-                                        line, hexa, 
-                                        operation, 
+                                        item.Address,
+                                        i,
+                                        line, hexa,
+                                        operation,
                                         null);
 
                                     outLines[i] = outLine;
@@ -595,7 +601,7 @@ namespace x07studio.Classes
                                     // Impossible de convertir la valeur hexa ---> Erreur !!!!
 
                                     Debug.WriteLine("ERREUR - PARTIE VARIABLE INCORRECTE !");
-                                    return null;
+                                    return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
                                 }
                             }
                         }
@@ -614,10 +620,11 @@ namespace x07studio.Classes
                                 var hexa = operation.Hexa.Replace("V0", p);
 
                                 var outLine = new OutLine(
-                                    item.Address, 
-                                    line, 
-                                    hexa, 
-                                    operation, 
+                                    item.Address,
+                                    i,
+                                    line,
+                                    hexa,
+                                    operation,
                                     null);
 
                                 outLines[i] = outLine;
@@ -627,7 +634,7 @@ namespace x07studio.Classes
                                 // Impossible de convertir la valeur hexa ---> Erreur !!!!
 
                                 Debug.WriteLine("ERREUR - PARTIE VARIABLE INCORRECTE !");
-                                return null;
+                                return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
                             }
                         }
                         else
@@ -635,7 +642,7 @@ namespace x07studio.Classes
                             // Paramètre inconnu !!!
 
                             Debug.WriteLine("ERREUR - PARTIE VARIABLE INCONNUE !");
-                            return null;
+                            return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCONNUE !", line);
                         }
                     }
                 }
@@ -647,13 +654,13 @@ namespace x07studio.Classes
 
                 var op = outLine.Code;
                 if (op.Length < 15) op += new string(' ', 15 - op.Length);
-                                               
+
                 Debug.WriteLine($"{addr} - {op} - {outLine.Hexa}");
             }
 
             Debug.WriteLine("");
 
-            return outLines;
+            return new AssembleResult(outLines);
         }
 
         public string CreateBasicLoader(List<OutLine> outLines)
@@ -1807,6 +1814,8 @@ namespace x07studio.Classes
 
         public class OutLine
         {
+            public int CodeLineNumber { get; set; }
+
             public UInt16 Address { get; set; }
             
             public string Code { get; set; }
@@ -1817,9 +1826,10 @@ namespace x07studio.Classes
 
             public string? LabelName { get; set; }
 
-            public OutLine(UInt16 address, string code, string hexa, OpDefinition? operation, string? labelName)
+            public OutLine(UInt16 address, int codeLineNumber, string code, string hexa, OpDefinition? operation, string? labelName)
             {
                 Address = address;
+                CodeLineNumber = codeLineNumber;
                 Code = code;
                 Hexa = hexa;
                 Operation = operation;
@@ -1837,6 +1847,41 @@ namespace x07studio.Classes
             {
                 Name = name;
                 Value = value;
+            }
+        }
+
+        public enum AssembleResultStatusEnum
+        {
+            None,
+            Success,
+            Error
+        }
+
+        public class AssembleResult
+        {
+            
+            public AssembleResultStatusEnum Status = AssembleResultStatusEnum.None;
+
+            public int ErrorLine { get; set; }
+
+            public string? ErrorCode { get; set; }
+
+            public string? ErrorMessage { get; set; }
+
+            public List<OutLine> Outlines { get; set; } = new();
+
+            public AssembleResult(List<OutLine> outlines)
+            {
+                Status = AssembleResultStatusEnum.Success;
+                Outlines = outlines;
+            }
+
+            public AssembleResult(int errorLine, string errorMessage, string errorCode)
+            {
+                Status = AssembleResultStatusEnum.Error;
+                ErrorLine = errorLine;
+                ErrorMessage = errorMessage;
+                ErrorCode = errorCode;
             }
         }
     }
