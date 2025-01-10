@@ -38,7 +38,7 @@ namespace x07studio.Classes
             for (int i = 0; i < lines.Length; i++)
             {
                 var source = lines[i];
-                var line = source.ToUpper();
+                var line = source;              
 
                 // On enlève les tabulations
 
@@ -48,6 +48,8 @@ namespace x07studio.Classes
 
                 var k = line.IndexOf("//");
                 if (k > -1) line = line.Substring(0, k).Trim();
+
+                var upperLine = line.ToUpper();
 
                 if (line == "")
                 {
@@ -83,7 +85,7 @@ namespace x07studio.Classes
 
                     labels.Add(name, pc);
                 }
-                else if (line.StartsWith("DATA "))
+                else if (upperLine.StartsWith("DATA "))
                 {
                     var values = line.Substring(5);
                     var items = DispatchValues(values);
@@ -150,6 +152,42 @@ namespace x07studio.Classes
                                         return new AssembleResult(i, "DATA INCORRECT !", line);
                                     }
                                 }
+                                else if (item.StartsWith("%"))
+                                {
+                                    // Un nombre binaire (max 16 bits)
+
+                                    UInt16 v = 0;
+
+                                    try
+                                    {
+                                        v = Convert.ToUInt16(item.Substring(1), 2);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // Erreur de convertion, non reconnu ou en dehors du UInt16
+
+                                        Debug.WriteLine($"DATA INCORRECT ! - {line}");
+                                        return new AssembleResult(i, "DATA INCORRECT !", line);
+                                    }
+
+                                    // Nombre décimal valide
+
+                                    if (v < 256)
+                                    {
+                                        // Valeur sur 8 bits
+
+                                        sbhexa.Append(v.ToString("X2"));
+                                    }
+                                    else
+                                    {
+                                        // Valeur sur 16 bits
+                                        // On doit inverser H1 et H2
+
+                                        var h16 = v.ToString("X4");
+                                        sbhexa.Append(h16.Substring(2, 2));
+                                        sbhexa.Append(h16.Substring(0, 2));
+                                    }
+                                }
                                 else
                                 {
                                     // Un nombre décimal
@@ -194,14 +232,14 @@ namespace x07studio.Classes
                         }
 
                         var hexa = sbhexa.ToString();
-
+                        
                         // On peut ajouter la ligne
 
                         var outLine = new OutLine
                             (pc,
                             i,
                             source,
-                            $"DATA x ${hexa.Length.ToString("X2")}",
+                            $"DATA",
                             hexa, null,
                             null);
 
@@ -214,28 +252,66 @@ namespace x07studio.Classes
                         return new AssembleResult(i, "DATA NON VALIDE !", line);
                     }
                 }
-                else if (line.StartsWith("DEFB "))
+                else if (upperLine.StartsWith("DEFB "))
                 {
                     // Constante de type BYTE
                     // Format = DEFB NAME V8
                     // DEFB TOTO 15
                     // DEFB TOTO $34
+                    // DEFB TOTO "A"
+                    // DEFB TOTO %11001101
 
                     var items = line.Split(' ');
 
                     if (items.Length == 3 && !consts.ContainsKey(items[1]))
                     {
-                        if (items[2].StartsWith("$"))
+                        var item = items[2];
+
+                        if (item.StartsWith("$"))
                         {
-                            if (byte.TryParse(items[2].Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var v))
+                            // Valeur HEXA
+
+                            if (byte.TryParse(item.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var v))
                             {
                                 consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X2")));
                                 continue;
                             }
                         }
+                        else if (item.StartsWith("%"))
+                        {
+                            // Valeur BINAIRE sur 8 BITS max
+
+                            try
+                            {
+                                var v = Convert.ToByte(item.Substring(1), 2);
+                                consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X2")));
+                                continue;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Erreur de conversion !
+                            }
+                        }
+                        else if (item.StartsWith("\""))
+                        {
+                            // CARACTERE -> Pattern = "X"
+
+                            if (item[2] == '"')
+                            {
+                                var v = (byte)item[1];
+                                consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X2")));
+                                continue;
+                            }
+                            else
+                            {
+                                // Erreur de pattern
+                            }
+                        }
                         else
                         {
-                            if (byte.TryParse(items[2], out var v))
+                            // Valeur DECIMALE sur 8 BITS max
+
+                            if (byte.TryParse(item, out var v))
                             {
                                 consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X2")));
                                 continue;
@@ -248,28 +324,50 @@ namespace x07studio.Classes
                     Debug.WriteLine($"DEFB NON VALIDE ! - {line}");
                     return new AssembleResult(i, "DEFB NON VALIDE !", line);
                 }
-                else if (line.StartsWith("DEFW "))
+                else if (upperLine.StartsWith("DEFW "))
                 {
                     // Constante de type WORD
                     // Format = DEFW NAME V16
                     // DEFW TOTO 15
                     // DEFW TOTO $3456
+                    // DEFW TOTO %1110011011
 
                     var items = line.Split(' ');
 
                     if (items.Length == 3 && !consts.ContainsKey(items[1]))
                     {
-                        if (items[2].StartsWith("$"))
+                        var item = items[2];
+
+                        if (item.StartsWith("$"))
                         {
-                            if (ushort.TryParse(items[2].Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var v))
+                            // Valeur HEXA
+
+                            if (ushort.TryParse(item.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var v))
                             {
                                 consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X4")));
                                 continue;
                             }
                         }
+                        else if (item.StartsWith("%"))
+                        {
+                            // Valeur BINAIRE sur 16 BITS max
+
+                            try
+                            {
+                                var v = Convert.ToUInt16(item.Substring(1), 2);
+                                consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X4")));
+                                continue;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Erreur de conversion !
+                            }
+                        }
                         else
                         {
-                            if (ushort.TryParse(items[2], out var v))
+                            // Valeur DECIMALE
+
+                            if (ushort.TryParse(item, out var v))
                             {
                                 consts.Add(items[1], new ConstDefinition(items[1], "$" + v.ToString("X4")));
                                 continue;
@@ -283,7 +381,7 @@ namespace x07studio.Classes
                     return new AssembleResult(i, "DEFW NON VALIDE !", line);
 
                 }
-                else if (line.StartsWith("ORG "))
+                else if (upperLine.StartsWith("ORG "))
                 {
                     var addr = line.Substring(4);
 
@@ -351,7 +449,7 @@ namespace x07studio.Classes
 
                     // On recherche l'opération correspondante
 
-                    var operation = SearchOperation(line);
+                    var operation = SearchOperation(upperLine);
 
                     if (operation == null)
                     {
@@ -442,6 +540,89 @@ namespace x07studio.Classes
                                     }
                                 }
                             }
+                            else if (pValue.StartsWith("\""))
+                            {
+                                // Valeur en caractère (1 seul caractère admis) à convertir en byte
+                                // "A" --> 65
+                                // Le patern est donc obligatoirement "X"
+                                // N'est valable qu'avec un paramètre de type V0
+
+                                if (operation.Parameter == "V0")
+                                {
+                                    if (pValue[2] == '"')
+                                    {
+                                        byte v8 = (byte)pValue[1];
+                                        pValue = v8.ToString("X2");
+                                        var newLine = line.Substring(0, pValueStart) + pValue;
+                                        if (pValueEnd > 0) newLine += line.Substring(pValueEnd);
+                                        line = newLine;
+                                    }
+                                    else
+                                    {
+                                        // Mauvais format !
+
+                                        Debug.WriteLine($"ERREUR - ERREUR CONVERSION CARACTERE VERS HEXA 8 BITS - {line} !");
+                                        return new AssembleResult(i, "ERREUR CONVERSION CARACTERE VERS HEXA 8 BITS !", line);
+                                    }
+                                }
+                                else
+                                {
+                                    // Pas bon !
+
+                                    Debug.WriteLine($"ERREUR - ERREUR CONVERSION CARACTERE NON ATTENDUE - {line} !");
+                                    return new AssembleResult(i, "ERREUR CONVERSION CARACTERE NON ATTENDUE !", line);
+                                }
+                            }
+                            else if (pValue.StartsWith("%"))
+                            {
+                                // Valeur en binaire
+                                // %110011 ou %111001111 
+                                // max 16 bits
+
+                                UInt16 v16 = 0;
+
+                                try
+                                {
+                                    v16 = Convert.ToUInt16(pValue.Substring(1), 2);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine($"ERREUR - ERREUR CONVERSION BINAIRE ! - {line} !");
+                                    return new AssembleResult(i, "ERREUR CONVERSION BINAIRE !", line);
+                                }
+
+                                // Valeur en décimal à convertir en X2 ou X4 suivant le type de paramètre attendu
+                                // H1H2 ou V0
+
+                                if (operation.Parameter == "H1H2")
+                                {
+                                    // On attend une valeur hexa sur 16 bits
+
+                                    pValue = v16.ToString("X4");
+                                    var newLine = line.Substring(0, pValueStart) + pValue;
+                                    if (pValueEnd > 0) newLine += line.Substring(pValueEnd);
+                                    line = newLine;
+                                }
+                                else if (operation.Parameter == "V0")
+                                {
+                                    // On attend une valeur hexa sur 8 bits
+
+                                    if (v16 < 256)
+                                    {
+                                        pValue = v16.ToString("X2");
+                                        var newLine = line.Substring(0, pValueStart) + pValue;
+                                        if (pValueEnd > 0) newLine += line.Substring(pValueEnd);
+                                        line = newLine;
+                                    }
+                                    else
+                                    {
+                                        // Valeur trop grande !
+
+                                        Debug.WriteLine($"ERREUR - VALEUR TROP GRANDE ! - {line} !");
+                                        return new AssembleResult(i, "ERREUR VALEUR TROP GRANDE !", line);
+                                    }
+                                }
+                            }
                             else
                             {
                                 // Valeur en décimal à convertir en X2 ou X4 suivant le type de paramètre attendu
@@ -491,7 +672,7 @@ namespace x07studio.Classes
                                 pc,
                                 i,
                                 source,
-                                line,
+                                line.ToUpper(),
                                 operation.Hexa,
                                 operation,
                                 labelName);
@@ -507,7 +688,7 @@ namespace x07studio.Classes
                                 pc,
                                 i,
                                 source,
-                                line,
+                                line.ToUpper(),
                                 operation.Hexa,
                                 operation,
                                 null);

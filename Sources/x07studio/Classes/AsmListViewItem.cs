@@ -18,6 +18,7 @@ namespace x07studio.Classes
             SubItems.Add(asmLine.Address.ToString("X4"));
             SubItems.Add(asmLine.Code);
             SubItems.Add(asmLine.Hexa);
+            SubItems.Add($"{asmLine.Hexa.Length / 2}");
         }
     }
 }

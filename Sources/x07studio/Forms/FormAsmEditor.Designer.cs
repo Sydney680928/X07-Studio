@@ -46,6 +46,7 @@
             CodePage = new TabPage();
             ComputerPage = new TabPage();
             AsmListView = new ListView();
+            Column5 = new ColumnHeader();
             menuStrip1 = new MenuStrip();
             Column0 = new ColumnHeader();
             Column1 = new ColumnHeader();
@@ -124,19 +125,21 @@
             // 
             // Column1
             // 
-            Column1.Text = "Address";
+            Column1.Text = "Adresse";
+            Column1.TextAlign = HorizontalAlignment.Center;
             // 
             // Column2
             // 
-            Column2.Text = "Code";
+            Column2.Text = "Opération";
             // 
             // Column3
             // 
-            Column3.Text = "Hexa";
+            Column3.Text = "Code machine";
             // 
             // Column4
             // 
-            Column4.Text = "";
+            Column4.Text = "Taille";
+            Column4.TextAlign = HorizontalAlignment.Right;
             // 
             // CodeEditor
             // 
@@ -190,7 +193,7 @@
             // 
             // AsmListView
             // 
-            AsmListView.Columns.AddRange(new ColumnHeader[] { Column0, Column1, Column2, Column3, Column4 });
+            AsmListView.Columns.AddRange(new ColumnHeader[] { Column0, Column1, Column2, Column3, Column4, Column5 });
             AsmListView.Dock = DockStyle.Fill;
             AsmListView.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             AsmListView.FullRowSelect = true;
@@ -205,6 +208,10 @@
             AsmListView.TabIndex = 0;
             AsmListView.UseCompatibleStateImageBehavior = false;
             AsmListView.View = View.Details;
+            // 
+            // Column5
+            // 
+            Column5.Text = "";
             // 
             // FormAsmEditor
             // 
@@ -245,5 +252,6 @@
         private ColumnHeader Column1;
         private ColumnHeader Column2;
         private ToolStripMenuItem CreateLoaderMenu;
+        private ColumnHeader Column5;
     }
 }
