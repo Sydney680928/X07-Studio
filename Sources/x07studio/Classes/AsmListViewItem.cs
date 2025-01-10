@@ -14,7 +14,8 @@ namespace x07studio.Classes
         {        
             AsmLine = asmLine;
 
-            SubItems[0].Text = asmLine.Address.ToString("X4");
+            SubItems[0].Text = asmLine.Source;
+            SubItems.Add(asmLine.Address.ToString("X4"));
             SubItems.Add(asmLine.Code);
             SubItems.Add(asmLine.Hexa);
         }

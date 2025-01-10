@@ -37,7 +37,8 @@ namespace x07studio.Classes
 
             for (int i = 0; i < lines.Length; i++)
             {
-                var line = lines[i];
+                var source = lines[i];
+                var line = source.ToUpper();
 
                 // On enlève les tabulations
 
@@ -199,6 +200,7 @@ namespace x07studio.Classes
                         var outLine = new OutLine
                             (pc,
                             i,
+                            source,
                             $"DATA x ${hexa.Length.ToString("X2")}",
                             hexa, null,
                             null);
@@ -317,7 +319,8 @@ namespace x07studio.Classes
                     var outLine = new OutLine(
                                 pc,
                                 i,
-                                "ORG",
+                                source,
+                                line,
                                 "",
                                 null,
                                 null);
@@ -487,6 +490,7 @@ namespace x07studio.Classes
                             var outLine = new OutLine(
                                 pc,
                                 i,
+                                source,
                                 line,
                                 operation.Hexa,
                                 operation,
@@ -502,6 +506,7 @@ namespace x07studio.Classes
                             var outLine = new OutLine(
                                 pc,
                                 i,
+                                source,
                                 line,
                                 operation.Hexa,
                                 operation,
@@ -590,7 +595,9 @@ namespace x07studio.Classes
                                     var outLine = new OutLine(
                                         item.Address,
                                         i,
-                                        line, hexa,
+                                        item.Source,
+                                        line,
+                                        hexa,
                                         operation,
                                         null);
 
@@ -622,6 +629,7 @@ namespace x07studio.Classes
                                 var outLine = new OutLine(
                                     item.Address,
                                     i,
+                                    item.Source,
                                     line,
                                     hexa,
                                     operation,
@@ -1173,6 +1181,11 @@ namespace x07studio.Classes
             AddDefinition("LD (IY+V0),H", "FD74V0");
             AddDefinition("LD (IY+V0),L", "FD75V0");
             AddDefinition("LD (IY+V0),V1", "FD36V0V1");
+
+            AddDefinition("LD (H1H2),A", "32H2H1");
+            AddDefinition("LD (H1H2),BC", "ED43H2H1");
+            AddDefinition("LD (H1H2),DE", "ED53H2H1");
+            AddDefinition("LD (H1H2),HL", "22H2H1");
 
             AddDefinition("LD (H1H2), IX", "DD22H2H1");
             AddDefinition("LD (H1H2), IY", "FD22H2H1");
@@ -1816,6 +1829,8 @@ namespace x07studio.Classes
         {
             public int CodeLineNumber { get; set; }
 
+            public string Source { get; set; }
+
             public UInt16 Address { get; set; }
             
             public string Code { get; set; }
@@ -1826,10 +1841,11 @@ namespace x07studio.Classes
 
             public string? LabelName { get; set; }
 
-            public OutLine(UInt16 address, int codeLineNumber, string code, string hexa, OpDefinition? operation, string? labelName)
+            public OutLine(UInt16 address, int codeLineNumber, string source, string code, string hexa, OpDefinition? operation, string? labelName)
             {
                 Address = address;
                 CodeLineNumber = codeLineNumber;
+                Source = source;    
                 Code = code;
                 Hexa = hexa;
                 Operation = operation;

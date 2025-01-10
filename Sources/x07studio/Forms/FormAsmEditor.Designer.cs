@@ -33,6 +33,7 @@
             ColumnHeader Column1;
             ColumnHeader Column2;
             ColumnHeader Column3;
+            ColumnHeader Column4;
             fichierToolStripMenuItem = new ToolStripMenuItem();
             FileNewMenu = new ToolStripMenuItem();
             FileOpenMenu = new ToolStripMenuItem();
@@ -50,6 +51,7 @@
             Column1 = new ColumnHeader();
             Column2 = new ColumnHeader();
             Column3 = new ColumnHeader();
+            Column4 = new ColumnHeader();
             menuStrip1.SuspendLayout();
             AsmEditorTab.SuspendLayout();
             CodePage.SuspendLayout();
@@ -118,19 +120,23 @@
             // 
             // Column0
             // 
-            Column0.Text = "Adresse";
+            Column0.Text = "Source";
             // 
             // Column1
             // 
-            Column1.Text = "Code";
+            Column1.Text = "Address";
             // 
             // Column2
             // 
-            Column2.Text = "Hexa";
+            Column2.Text = "Code";
             // 
             // Column3
             // 
-            Column3.Text = "";
+            Column3.Text = "Hexa";
+            // 
+            // Column4
+            // 
+            Column4.Text = "";
             // 
             // CodeEditor
             // 
@@ -184,7 +190,7 @@
             // 
             // AsmListView
             // 
-            AsmListView.Columns.AddRange(new ColumnHeader[] { Column0, Column1, Column2, Column3 });
+            AsmListView.Columns.AddRange(new ColumnHeader[] { Column0, Column1, Column2, Column3, Column4 });
             AsmListView.Dock = DockStyle.Fill;
             AsmListView.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             AsmListView.FullRowSelect = true;
