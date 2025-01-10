@@ -320,7 +320,7 @@ namespace x07studio.Classes
                                 pc,
                                 i,
                                 source,
-                                line,
+                                "ORG",
                                 "",
                                 null,
                                 null);
@@ -700,7 +700,7 @@ namespace x07studio.Classes
                         currentDataLine.Clear();
                     }
 
-                    sb.AppendLine($"{numLine} DATA ORG,{line.Address.ToString("X4")}");
+                    sb.AppendLine($"{numLine} DATA \"ORG\",{line.Address.ToString("X4")}");
                     numLine += 10;
                 }
                 else
@@ -711,7 +711,7 @@ namespace x07studio.Classes
                         currentDataLine.Append(line.Hexa.Substring(j, 2));
                     }
 
-                    if (currentDataLine.Length > 30)
+                    if (currentDataLine.Length > 20)
                     {
                         sb.AppendLine($"{numLine} DATA {currentDataLine.ToString()}");
                         numLine += 10;
@@ -727,7 +727,7 @@ namespace x07studio.Classes
                 currentDataLine.Clear();
             }
 
-            sb.AppendLine($"{numLine} DATA END");
+            sb.AppendLine($"{numLine} DATA \"END\"");
 
             return sb.ToString();
         }

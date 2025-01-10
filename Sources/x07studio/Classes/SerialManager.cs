@@ -113,7 +113,7 @@ namespace x07studio.Classes
 
         public void SendCommand(string command)
         {
-            if (_SerialPort != null && _SerialPort.IsOpen)
+            if (!string.IsNullOrEmpty(command) && _SerialPort != null && _SerialPort.IsOpen)
             {
                 var bytes = Encoding.Unicode.GetBytes(command);
                 var b2 = new byte[bytes.Length / 2];
