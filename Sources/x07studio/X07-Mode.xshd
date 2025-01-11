@@ -15,7 +15,7 @@
 				<Begin singleword="true">REM </Begin>
 			</Span>
 
-			<Span name = "COMMENT2" bold = "false" italic = "true" color = "Green" stopateol = "true">
+			<Span name = "COMMENT2" bold = "false" italic = "true" color = "DarkGray" stopateol = "true">
 				<Begin singleword="true">//</Begin>
 			</Span>
 
@@ -162,6 +162,15 @@
 				<Key word = "VAL" />
 				<Key word = "VARPTR" />
 			</KeyWords>
+
+			<KeyWords name = "boolean" bold="false" italic="false" color="Orange">
+				<Key word = "OR" />
+				<Key word = "AND" />
+				<Key word = "XOR" />
+				<Key word = "EQV" />
+				<Key word = "NOT" />
+			</KeyWords>
+
 
 		</RuleSet>
 		
