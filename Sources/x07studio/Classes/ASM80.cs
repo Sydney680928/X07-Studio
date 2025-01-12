@@ -33,7 +33,7 @@ namespace x07studio.Classes
             var labels = new Dictionary<string, ushort>();
             var outLines = new List<OutLine>();
             var lines = code.Split("\r\n");
-            UInt16 pc = 0;
+            UInt16 pc = 0x1000;
 
             for (int i = 0; i < lines.Length; i++)
             {
@@ -520,7 +520,7 @@ namespace x07studio.Classes
                                         return new AssembleResult(i, "ERREUR CONVERSION HEXA 16 BITS !", line);
                                     }
                                 }
-                                else if (operation.Parameter == "V0")
+                                else if (operation.Parameter == "V0" || operation.Parameter == "VP" || operation.Parameter == "VN")
                                 {
                                     // On attend une valeur hexa sur 8 bits
 
@@ -547,7 +547,7 @@ namespace x07studio.Classes
                                 // Le patern est donc obligatoirement "X"
                                 // N'est valable qu'avec un paramètre de type V0
 
-                                if (operation.Parameter == "V0")
+                                if (operation.Parameter == "V0" || operation.Parameter == "VP" || operation.Parameter == "VN")
                                 {
                                     if (pValue[2] == '"')
                                     {
@@ -603,7 +603,7 @@ namespace x07studio.Classes
                                     if (pValueEnd > 0) newLine += line.Substring(pValueEnd);
                                     line = newLine;
                                 }
-                                else if (operation.Parameter == "V0")
+                                else if (operation.Parameter == "V0" || operation.Parameter == "VP" || operation.Parameter == "VN")
                                 {
                                     // On attend une valeur hexa sur 8 bits
 
@@ -647,13 +647,13 @@ namespace x07studio.Classes
                                         return new AssembleResult(i, "ERREUR CONVERSION DECIMAL VERS HEXA 16 BITS !", line);
                                     }
                                 }
-                                else if (operation.Parameter == "V0")
+                                else if (operation.Parameter == "V0" || operation.Parameter == "VP" || operation.Parameter == "VN")
                                 {
-                                    // On attend une valeur hexa sur 8 bits
+                                    // On attend une valeur numérique sur 8 bits non signé
 
-                                    if (byte.TryParse(pValue, out var v8))
+                                    if (byte.TryParse(pValue, out var v))
                                     {
-                                        pValue = v8.ToString("X2");
+                                        pValue = v.ToString("X2");
                                         var newLine = line.Substring(0, pValueStart) + pValue;
                                         if (pValueEnd > 0) newLine += line.Substring(pValueEnd);
                                         line = newLine;
@@ -717,8 +717,9 @@ namespace x07studio.Classes
                         var line = item.Code;
 
                         // Il faut traiter la présence d'un paramètre                            
-                        // Soit H1H2 ---> valeur hexa sur 16 bits
-                        // Soit V0   ---> valeur hexa sur 8 bits
+                        // Soit H1H2 ---> valeur hexa sur 16 bits nono signé
+                        // Soit V0   ---> valeur hexa sur 8 bits non signé
+                        // Soit VP ou VN ---> valeur hexa signé à convertir en hexa 8 bit non signé
                         // Le paramètre est placé obligatoirement entre le start et le end
 
                         // Si label on le remplace par son adresse avant le traitement
@@ -801,11 +802,83 @@ namespace x07studio.Classes
 
                             // On essaye de la convertir en hexa 8 bits
 
-                            if (int.TryParse(p, System.Globalization.NumberStyles.HexNumber, null, out var v8))
+                            if (byte.TryParse(p, System.Globalization.NumberStyles.HexNumber, null, out var v))
                             {
                                 // On peut composer la séquence finale hexa
 
                                 var hexa = operation.Hexa.Replace("V0", p);
+
+                                var outLine = new OutLine(
+                                    item.Address,
+                                    i,
+                                    item.Source,
+                                    line,
+                                    hexa,
+                                    operation,
+                                    null);
+
+                                outLines[i] = outLine;
+                            }
+                            else
+                            {
+                                // Impossible de convertir la valeur hexa ---> Erreur !!!!
+
+                                Debug.WriteLine("ERREUR - PARTIE VARIABLE INCORRECTE !");
+                                return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
+                            }
+                        }
+                        else if (operation.Parameter == "VP")
+                        {
+                            // On extrait la partie paramètre de line
+
+                            var p = line.Substring(operation.Start.Length, 2);
+
+                            // On essaye de la convertir en hexa 8 bits signé
+                            // Le résultat DOIT être positif (VP et VN sont définis en valeur absolue)
+
+                            if (sbyte.TryParse(p, System.Globalization.NumberStyles.HexNumber, null, out var v8) && v8 >= 0)
+                            {
+                                // On peut composer la séquence finale hexa
+
+                                var hexa = operation.Hexa.Replace("VP", p);
+
+                                var outLine = new OutLine(
+                                    item.Address,
+                                    i,
+                                    item.Source,
+                                    line,
+                                    hexa,
+                                    operation,
+                                    null);
+
+                                outLines[i] = outLine;
+                            }
+                            else
+                            {
+                                // Impossible de convertir la valeur hexa ---> Erreur !!!!
+
+                                Debug.WriteLine("ERREUR - PARTIE VARIABLE INCORRECTE !");
+                                return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
+                            }
+                        }
+                        else if (operation.Parameter == "VN")
+                        {
+                            // On extrait la partie paramètre de line
+
+                            var p = line.Substring(operation.Start.Length, 2);
+
+                            // On essaye de la convertir en hexa 8 bits signé
+                            // Le résultat DOIT être positif (VP et VN sont définis en valeur absolue)
+
+                            if (sbyte.TryParse(p, System.Globalization.NumberStyles.HexNumber, null, out var v8) && v8 >= 0)
+                            {
+                                // On doit placer dans la séquence hexa la valeur négative de v8 
+
+                                var h = $"{(sbyte)-v8:X2}";
+
+                                // On peut composer la séquence finale hexa
+
+                                var hexa = operation.Hexa.Replace("VN", h);
 
                                 var outLine = new OutLine(
                                     item.Address,
@@ -1015,8 +1088,13 @@ namespace x07studio.Classes
             // ADC
 
             AddDefinition("ADC A,(HL)", "8E");         
-            AddDefinition("ADC A,(IX+V0)", "DD8EV0");
-            AddDefinition("ADC A,(IY+V0)", "FD8EV0");            
+            
+            AddDefinition("ADC A,(IX+VP)", "DD8EVP");
+            AddDefinition("ADC A,(IY+VP)", "FD8EVP");
+
+            AddDefinition("ADC A,(IX-VN)", "DD8EVN");
+            AddDefinition("ADC A,(IY-VN)", "FD8EVN");
+
             AddDefinition("ADC A,A", "8F");
             AddDefinition("ADC A,B", "88");
             AddDefinition("ADC A,C", "89");
@@ -1033,8 +1111,13 @@ namespace x07studio.Classes
             // ADD
 
             AddDefinition("ADD A,(HL)", "86");
-            AddDefinition("ADD A,(IX+V0)", "DD86V0");
-            AddDefinition("ADD A,(IY+V0)", "FD86V0");
+
+            AddDefinition("ADD A,(IX+VP)", "DD86VP");
+            AddDefinition("ADD A,(IY+VP)", "FD86VP");
+
+            AddDefinition("ADD A,(IX-VN)", "DD86VN");
+            AddDefinition("ADD A,(IY-VN)", "FD86VN");
+
             AddDefinition("ADD A,A", "87");
             AddDefinition("ADD A,B", "80");
             AddDefinition("ADD A,C", "81");
@@ -1059,8 +1142,13 @@ namespace x07studio.Classes
             // AND
 
             AddDefinition("AND (HL)", "A6");
-            AddDefinition("AND (IX+V0)", "DDA6V0");
-            AddDefinition("AND (IY+V0)", "FDA6V0");
+
+            AddDefinition("AND (IX+VP)", "DDA6VP");
+            AddDefinition("AND (IY+VP)", "FDA6VP");
+
+            AddDefinition("AND (IX-VN)", "DDA6VN");
+            AddDefinition("AND (IY-VN)", "FDA6VN");
+
             AddDefinition("AND A", "A7");
             AddDefinition("AND B", "A0");
             AddDefinition("AND C", "A1");
@@ -1073,8 +1161,13 @@ namespace x07studio.Classes
             // BIT
 
             AddDefinition("BIT 0,(HL)", "CB46");
-            AddDefinition("BIT 0,(IX+V0)", "DDCBV046");
-            AddDefinition("BIT 0,(IY+V0)", "FDCBV046");
+
+            AddDefinition("BIT 0,(IX+VP)", "DDCBVP46");
+            AddDefinition("BIT 0,(IY+VP)", "FDCBVP46");
+
+            AddDefinition("BIT 0,(IX-VN)", "DDCBVN46");
+            AddDefinition("BIT 0,(IY-VN)", "FDCBVN46");
+
             AddDefinition("BIT 0,A", "CB47");
             AddDefinition("BIT 0,B", "CB40");
             AddDefinition("BIT 0,C", "CB41");
@@ -1084,8 +1177,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 0,L", "CB45");
 
             AddDefinition("BIT 1,(HL)", "CB4E");
-            AddDefinition("BIT 1,(IX+V0)", "DDCBV04E");
-            AddDefinition("BIT 1,(IY+V0)", "FDCBV04E");
+
+            AddDefinition("BIT 1,(IX+VP)", "DDCBVP4E");
+            AddDefinition("BIT 1,(IY+VP)", "FDCBVP4E");
+
+            AddDefinition("BIT 1,(IX-VN)", "DDCBVN4E");
+            AddDefinition("BIT 1,(IY-VN)", "FDCBVN4E");
+
             AddDefinition("BIT 1,A", "CB4F");
             AddDefinition("BIT 1,B", "CB48");
             AddDefinition("BIT 1,C", "CB49");
@@ -1095,8 +1193,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 1,L", "CB4D");
 
             AddDefinition("BIT 2,(HL)", "CB56");
-            AddDefinition("BIT 2,(IX+V0)", "DDCBV056");
-            AddDefinition("BIT 2,(IY+V0)", "FDCBV056");
+
+            AddDefinition("BIT 2,(IX+VP)", "DDCBVP56");
+            AddDefinition("BIT 2,(IY+VP)", "FDCBVP56");
+
+            AddDefinition("BIT 2,(IX-VN)", "DDCBVN56");
+            AddDefinition("BIT 2,(IY-VN)", "FDCBVN56");
+
             AddDefinition("BIT 2,A", "CB57");
             AddDefinition("BIT 2,B", "CB50");
             AddDefinition("BIT 2,C", "CB51");
@@ -1106,8 +1209,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 2,L", "CB55");
 
             AddDefinition("BIT 3,(HL)", "CB5E");
-            AddDefinition("BIT 3,(IX+V0)", "DDCBV05E");
-            AddDefinition("BIT 3,(IY+V0)", "FDCBV05E");
+
+            AddDefinition("BIT 3,(IX+VP)", "DDCBVP5E");
+            AddDefinition("BIT 3,(IY+VP)", "FDCBVP5E");
+
+            AddDefinition("BIT 3,(IX-VN)", "DDCBVN5E");
+            AddDefinition("BIT 3,(IY-VN)", "FDCBVN5E");
+
             AddDefinition("BIT 3,A", "CB5F");
             AddDefinition("BIT 3,B", "CB58");
             AddDefinition("BIT 3,C", "CB59");
@@ -1117,8 +1225,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 3,L", "CB5D");
 
             AddDefinition("BIT 4,(HL)", "CB66");
-            AddDefinition("BIT 4,(IX+V0)", "DDCBV066");
-            AddDefinition("BIT 4,(IY+V0)", "FDCBV066");
+
+            AddDefinition("BIT 4,(IX+VP)", "DDCBVP66");
+            AddDefinition("BIT 4,(IY+VP)", "FDCBVP66");
+
+            AddDefinition("BIT 4,(IX-VN)", "DDCBVN66");
+            AddDefinition("BIT 4,(IY-VN)", "FDCBVN66");
+
             AddDefinition("BIT 4,A", "CB67");
             AddDefinition("BIT 4,B", "CB60");
             AddDefinition("BIT 4,C", "CB61");
@@ -1128,8 +1241,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 4,L", "CB65");
 
             AddDefinition("BIT 5,(HL)", "CB6E");
-            AddDefinition("BIT 5,(IX+V0)", "DDCBV06E");
-            AddDefinition("BIT 5,(IY+V0)", "FDCBV06E");
+
+            AddDefinition("BIT 5,(IX+VP)", "DDCBVP6E");
+            AddDefinition("BIT 5,(IY+VP)", "FDCBVP6E");
+
+            AddDefinition("BIT 5,(IX-VN)", "DDCBVN6E");
+            AddDefinition("BIT 5,(IY-VN)", "FDCBVN6E");
+
             AddDefinition("BIT 5,A", "CB6F");
             AddDefinition("BIT 5,B", "CB68");
             AddDefinition("BIT 5,C", "CB69");
@@ -1139,8 +1257,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 5,L", "CB6D");
 
             AddDefinition("BIT 6,(HL)", "CB76");
-            AddDefinition("BIT 6,(IX+V0)", "DDCBV076");
-            AddDefinition("BIT 6,(IY+V0)", "FDCBV076");
+
+            AddDefinition("BIT 6,(IX+VP)", "DDCBVP76");
+            AddDefinition("BIT 6,(IY+VP)", "FDCBVP76");
+
+            AddDefinition("BIT 6,(IX-VN)", "DDCBVN76");
+            AddDefinition("BIT 6,(IY-VN)", "FDCBVN76");
+
             AddDefinition("BIT 6,A", "CB77");
             AddDefinition("BIT 6,B", "CB70");
             AddDefinition("BIT 6,C", "CB71");
@@ -1150,8 +1273,13 @@ namespace x07studio.Classes
             AddDefinition("BIT 6,L", "CB75");
 
             AddDefinition("BIT 7,(HL)", "CB7E");
-            AddDefinition("BIT 7,(IX+V0)", "DDCBV07E");
-            AddDefinition("BIT 7,(IY+V0)", "FDCBV07E");
+
+            AddDefinition("BIT 7,(IX+VP)", "DDCBVP7E");
+            AddDefinition("BIT 7,(IY+VP)", "FDCBVP7E");
+
+            AddDefinition("BIT 7,(IX-VN)", "DDCBVN7E");
+            AddDefinition("BIT 7,(IY-VN)", "FDCBVN7E");
+
             AddDefinition("BIT 7,A", "CB7F");
             AddDefinition("BIT 7,B", "CB78");
             AddDefinition("BIT 7,C", "CB79");
@@ -1179,8 +1307,13 @@ namespace x07studio.Classes
             // CP
 
             AddDefinition("CP (HL)", "BE");
-            AddDefinition("CP (IX+V0)", "DDBEV0");
-            AddDefinition("CP (IY+V0)", "FDBEV0");
+
+            AddDefinition("CP (IX+VP)", "DDBEVP");
+            AddDefinition("CP (IY+VP)", "FDBEVP");
+
+            AddDefinition("CP (IX-VN)", "DDBEVN");
+            AddDefinition("CP (IY-VN)", "FDBEVN");
+
             AddDefinition("CP A", "BF");
             AddDefinition("CP B", "B8");
             AddDefinition("CP C", "B9");
@@ -1213,8 +1346,13 @@ namespace x07studio.Classes
             // DEC
 
             AddDefinition("DEC (HL)", "35");
-            AddDefinition("DEC (IX+V0)", "DD35V0");
-            AddDefinition("DEC (IY+V0)", "FD35V0");
+
+            AddDefinition("DEC (IX+VP)", "DD35VP");
+            AddDefinition("DEC (IY+VP)", "FD35VP");
+
+            AddDefinition("DEC (IX-VN)", "DD35VN");
+            AddDefinition("DEC (IY-VN)", "FD35VN");
+
             AddDefinition("DEC A", "3D");
             AddDefinition("DEC B", "05");
             AddDefinition("DEC BC", "0B");
@@ -1277,8 +1415,13 @@ namespace x07studio.Classes
             // INC
 
             AddDefinition("INC (HL)", "34");
-            AddDefinition("INC (IX+V0)", "DD34V0");
-            AddDefinition("INC (IY+V0)", "FD34V0");
+
+            AddDefinition("INC (IX+VP)", "DD34VP");
+            AddDefinition("INC (IY+VP)", "FD34VP");
+
+            AddDefinition("INC (IX-VN)", "DD34VN");
+            AddDefinition("INC (IY-VN)", "FD34VN");
+
             AddDefinition("INC A", "3C");
             AddDefinition("INC B", "04");
             AddDefinition("INC BC", "03");
@@ -1345,23 +1488,41 @@ namespace x07studio.Classes
             AddDefinition("LD (HL),L", "75");
             AddDefinition("LD (HL),V0", "36V0");
 
-            AddDefinition("LD (IX+V0),A", "DD77V0");
-            AddDefinition("LD (IX+V0),B", "DD70V0");
-            AddDefinition("LD (IX+V0),C", "DD71V0");
-            AddDefinition("LD (IX+V0),D", "DD72V0");
-            AddDefinition("LD (IX+V0),E", "DD73V0");
-            AddDefinition("LD (IX+V0),H", "DD74V0");
-            AddDefinition("LD (IX+V0),L", "DD75V0");
-            AddDefinition("LD (IX+V0),V1", "DD36V0V1");
+            AddDefinition("LD (IX+VP),A", "DD77VP");
+            AddDefinition("LD (IX+VP),B", "DD70VP");
+            AddDefinition("LD (IX+VP),C", "DD71VP");
+            AddDefinition("LD (IX+VP),D", "DD72VP");
+            AddDefinition("LD (IX+VP),E", "DD73VP");
+            AddDefinition("LD (IX+VP),H", "DD74VP");
+            AddDefinition("LD (IX+VP),L", "DD75VP");
+            AddDefinition("LD (IX+VP),V0", "DD36VPV0");
 
-            AddDefinition("LD (IY+V0),A", "FD77V0");
-            AddDefinition("LD (IY+V0),B", "FD70V0");
-            AddDefinition("LD (IY+V0),C", "FD71V0");
-            AddDefinition("LD (IY+V0),D", "FD72V0");
-            AddDefinition("LD (IY+V0),E", "FD73V0");
-            AddDefinition("LD (IY+V0),H", "FD74V0");
-            AddDefinition("LD (IY+V0),L", "FD75V0");
-            AddDefinition("LD (IY+V0),V1", "FD36V0V1");
+            AddDefinition("LD (IX-VN),A", "DD77VN");
+            AddDefinition("LD (IX-VN),B", "DD70VN");
+            AddDefinition("LD (IX-VN),C", "DD71VN");
+            AddDefinition("LD (IX-VN),D", "DD72VN");
+            AddDefinition("LD (IX-VN),E", "DD73VN");
+            AddDefinition("LD (IX-VN),H", "DD74VN");
+            AddDefinition("LD (IX-VN),L", "DD75VN");
+            AddDefinition("LD (IX-VN),V0", "DD36VNV0");
+
+            AddDefinition("LD (IY+VP),A", "FD77VP");
+            AddDefinition("LD (IY+VP),B", "FD70VP");
+            AddDefinition("LD (IY+VP),C", "FD71VP");
+            AddDefinition("LD (IY+VP),D", "FD72VP");
+            AddDefinition("LD (IY+VP),E", "FD73VP");
+            AddDefinition("LD (IY+VP),H", "FD74VP");
+            AddDefinition("LD (IY+VP),L", "FD75VP");
+            AddDefinition("LD (IY+VP),V0", "FD36VPV0");
+
+            AddDefinition("LD (IY-VN),A", "FD77VN");
+            AddDefinition("LD (IY-VN),B", "FD70VN");
+            AddDefinition("LD (IY-VN),C", "FD71VN");
+            AddDefinition("LD (IY-VN),D", "FD72VN");
+            AddDefinition("LD (IY-VN),E", "FD73VN");
+            AddDefinition("LD (IY-VN),H", "FD74VN");
+            AddDefinition("LD (IY-VN),L", "FD75VN");
+            AddDefinition("LD (IY-VN),V0", "FD36VNV0");
 
             AddDefinition("LD (H1H2),A", "32H2H1");
             AddDefinition("LD (H1H2),BC", "ED43H2H1");
@@ -1375,8 +1536,13 @@ namespace x07studio.Classes
             AddDefinition("LD A,(BC)", "0A");
             AddDefinition("LD A,(DE)", "1A");
             AddDefinition("LD A,(HL)", "7E");
-            AddDefinition("LD A,(IX+V0)", "DD7EV0");
-            AddDefinition("LD A,(IY+V0)", "FD7EV0");
+
+            AddDefinition("LD A,(IX+VP)", "DD7EVP");
+            AddDefinition("LD A,(IY+VP)", "FD7EVP");
+
+            AddDefinition("LD A,(IX-VN)", "DD7EVN");
+            AddDefinition("LD A,(IY-VN)", "FD7EVN");
+
             AddDefinition("LD A,(H1H2)", "3AH2H1");
             AddDefinition("LD A,A", "7F");
             AddDefinition("LD A,B", "78");
@@ -1390,8 +1556,13 @@ namespace x07studio.Classes
             AddDefinition("LD A,R", "ED5F");
 
             AddDefinition("LD B,(HL)", "46");
-            AddDefinition("LD B,(IX+V0)", "DD46V0");
-            AddDefinition("LD B,(IY+V0)", "FD46V0");
+
+            AddDefinition("LD B,(IX+VP)", "DD46VP");
+            AddDefinition("LD B,(IY+VP)", "FD46VP");
+
+            AddDefinition("LD B,(IX-VN)", "DD46VN");
+            AddDefinition("LD B,(IY-VN)", "FD46VN");
+
             AddDefinition("LD B,A", "47");
             AddDefinition("LD B,B", "40");
             AddDefinition("LD B,C", "41");
@@ -1404,8 +1575,13 @@ namespace x07studio.Classes
             AddDefinition("LD BC,H1H2", "01H2H1");
 
             AddDefinition("LD C,(HL)", "4E");
-            AddDefinition("LD C,(IX+V0)", "DD4EV0");
-            AddDefinition("LD C,(IY+V0)", "FD4EV0");
+
+            AddDefinition("LD C,(IX+VP)", "DD4EVP");
+            AddDefinition("LD C,(IY+VP)", "FD4EVP");
+
+            AddDefinition("LD C,(IX-VN)", "DD4EVN");
+            AddDefinition("LD C,(IY-VN)", "FD4EVN");
+
             AddDefinition("LD C,A", "4F");
             AddDefinition("LD C,B", "48");
             AddDefinition("LD C,C", "49");
@@ -1416,8 +1592,13 @@ namespace x07studio.Classes
             AddDefinition("LD C,V0", "0EV0");
 
             AddDefinition("LD D,(HL)", "56");
-            AddDefinition("LD D,(IX+V0)", "DD56V0");
-            AddDefinition("LD D,(IY+V0)", "FD56V0");
+
+            AddDefinition("LD D,(IX+VP)", "DD56VP");
+            AddDefinition("LD D,(IY+VP)", "FD56VP");
+
+            AddDefinition("LD D,(IX-VN)", "DD56VN");
+            AddDefinition("LD D,(IY-VN)", "FD56VN");
+
             AddDefinition("LD D,A", "57");
             AddDefinition("LD D,B", "50");
             AddDefinition("LD D,C", "51");
@@ -1430,8 +1611,13 @@ namespace x07studio.Classes
             AddDefinition("LD DE,H1H2", "11H2H1");
 
             AddDefinition("LD E,(HL)", "5E");
-            AddDefinition("LD E,(IX+V0)", "DD5EV0");
-            AddDefinition("LD E,(IY+V0)", "FD5EV0");
+
+            AddDefinition("LD E,(IX+VP)", "DD5EVP");
+            AddDefinition("LD E,(IY+VP)", "FD5EVP");
+
+            AddDefinition("LD E,(IX-VN)", "DD5EVN");
+            AddDefinition("LD E,(IY-VN)", "FD5EVN");
+
             AddDefinition("LD E,A", "5F");
             AddDefinition("LD E,B", "58");
             AddDefinition("LD E,C", "59");
@@ -1442,8 +1628,13 @@ namespace x07studio.Classes
             AddDefinition("LD E,V0", "1EV0");
 
             AddDefinition("LD H,(HL)", "66");
-            AddDefinition("LD H,(IX+V0)", "DD66V0");
-            AddDefinition("LD H,(IY+V0)", "FD66V0");
+
+            AddDefinition("LD H,(IX+VP)", "DD66VP");
+            AddDefinition("LD H,(IY+VP)", "FD66VP");
+
+            AddDefinition("LD H,(IX-VN)", "DD66VN");
+            AddDefinition("LD H,(IY-VN)", "FD66VN");
+
             AddDefinition("LD H,A", "67");
             AddDefinition("LD H,B", "60");
             AddDefinition("LD H,C", "61");
@@ -1462,8 +1653,13 @@ namespace x07studio.Classes
             AddDefinition("LD IY,H1H2", "FD21H2H1");
 
             AddDefinition("LD L,(HL)", "6E");
-            AddDefinition("LD L,(IX+V0)", "DD6EV0");
-            AddDefinition("LD L,(IY+V0)", "FD6EV0");
+
+            AddDefinition("LD L,(IX+VP)", "DD6EVP");
+            AddDefinition("LD L,(IY+VP)", "FD6EVP");
+
+            AddDefinition("LD L,(IX-VN)", "DD6EVN");
+            AddDefinition("LD L,(IY-VN)", "FD6EVN");
+
             AddDefinition("LD L,A", "6F");
             AddDefinition("LD L,B", "68");
             AddDefinition("LD L,C", "69");
@@ -1500,8 +1696,13 @@ namespace x07studio.Classes
             // OR
 
             AddDefinition("OR (HL)", "B6");
-            AddDefinition("OR (IX+V0)", "DDB6V0");
-            AddDefinition("OR (IY+V0)", "FDB6V0");
+
+            AddDefinition("OR (IX+VP)", "DDB6VP");
+            AddDefinition("OR (IY+VP)", "FDB6VP");
+
+            AddDefinition("OR (IX-VN)", "DDB6VN");
+            AddDefinition("OR (IY-VN)", "FDB6VN");
+
             AddDefinition("OR A", "B7");
             AddDefinition("OR B", "B0");
             AddDefinition("OR C", "B1");
@@ -1559,8 +1760,13 @@ namespace x07studio.Classes
             // RES
 
             AddDefinition("RES 0,(HL)", "CB86");
-            AddDefinition("RES 0,(IX+V0)", "DDCBV086");
-            AddDefinition("RES 0,(IY+V0)", "FDCBV086");
+
+            AddDefinition("RES 0,(IX+VP)", "DDCBVP86");
+            AddDefinition("RES 0,(IY+VP)", "FDCBVP86");
+
+            AddDefinition("RES 0,(IX-VN)", "DDCBVN86");
+            AddDefinition("RES 0,(IY-VN)", "FDCBVN86");
+
             AddDefinition("RES 0,A", "CB87");
             AddDefinition("RES 0,B", "CB80");
             AddDefinition("RES 0,C", "CB81");
@@ -1570,8 +1776,13 @@ namespace x07studio.Classes
             AddDefinition("RES 0,L", "CB85");
 
             AddDefinition("RES 1,(HL)", "CB8E");
-            AddDefinition("RES 1,(IX+V0)", "DDCBV08E");
-            AddDefinition("RES 1,(IY+V0)", "FDCBV08E");
+
+            AddDefinition("RES 1,(IX+VP)", "DDCBVP8E");
+            AddDefinition("RES 1,(IY+VP)", "FDCBVP8E");
+
+            AddDefinition("RES 1,(IX-VN)", "DDCBVN8E");
+            AddDefinition("RES 1,(IY-VN)", "FDCBVN8E");
+
             AddDefinition("RES 1,A", "CB8F");
             AddDefinition("RES 1,B", "CB88");
             AddDefinition("RES 1,C", "CB89");
@@ -1581,8 +1792,13 @@ namespace x07studio.Classes
             AddDefinition("RES 1,L", "CB8D");
 
             AddDefinition("RES 2,(HL)", "CB96");
-            AddDefinition("RES 2,(IX+V0)", "DDCBV096");
-            AddDefinition("RES 2,(IY+V0)", "FDCBV096");
+
+            AddDefinition("RES 2,(IX+VP)", "DDCBVP96");
+            AddDefinition("RES 2,(IY+VP)", "FDCBVP96");
+
+            AddDefinition("RES 2,(IX-VN)", "DDCBVN96");
+            AddDefinition("RES 2,(IY-VN)", "FDCBVN96");
+
             AddDefinition("RES 2,A", "CB97");
             AddDefinition("RES 2,B", "CB90");
             AddDefinition("RES 2,C", "CB91");
@@ -1592,8 +1808,13 @@ namespace x07studio.Classes
             AddDefinition("RES 2,L", "CB95");
 
             AddDefinition("RES 3,(HL)", "CB9E");
-            AddDefinition("RES 3,(IX+V0)", "DDCBV09E");
-            AddDefinition("RES 3,(IY+V0)", "FDCBV09E");
+
+            AddDefinition("RES 3,(IX+VP)", "DDCBVP9E");
+            AddDefinition("RES 3,(IY+VP)", "FDCBVP9E");
+
+            AddDefinition("RES 3,(IX-VN)", "DDCBVN9E");
+            AddDefinition("RES 3,(IY-VN)", "FDCBVN9E");
+
             AddDefinition("RES 3,A", "CB9F");
             AddDefinition("RES 3,B", "CB98");
             AddDefinition("RES 3,C", "CB99");
@@ -1603,8 +1824,13 @@ namespace x07studio.Classes
             AddDefinition("RES 3,L", "CB9D");
 
             AddDefinition("RES 4,(HL)", "CBA6");
-            AddDefinition("RES 4,(IX+V0)", "DDCBV0A6");
-            AddDefinition("RES 4,(IY+V0)", "FDCBV0A6");
+
+            AddDefinition("RES 4,(IX+VP)", "DDCBVPA6");
+            AddDefinition("RES 4,(IY+VP)", "FDCBVPA6");
+
+            AddDefinition("RES 4,(IX-VN)", "DDCBVNA6");
+            AddDefinition("RES 4,(IY-VN)", "FDCBVNA6");
+
             AddDefinition("RES 4,A", "CBA7");
             AddDefinition("RES 4,B", "CBA0");
             AddDefinition("RES 4,C", "CBA1");
@@ -1614,8 +1840,13 @@ namespace x07studio.Classes
             AddDefinition("RES 4,L", "CBA5");
 
             AddDefinition("RES 5,(HL)", "CBAE");
-            AddDefinition("RES 5,(IX+V0)", "DDCBV0AE");
-            AddDefinition("RES 5,(IY+V0)", "FDCBV0AE");
+
+            AddDefinition("RES 5,(IX+VP)", "DDCBVPAE");
+            AddDefinition("RES 5,(IY+VP)", "FDCBVPAE");
+
+            AddDefinition("RES 5,(IX-VN)", "DDCBVNAE");
+            AddDefinition("RES 5,(IY-VN)", "FDCBVNAE");
+
             AddDefinition("RES 5,A", "CBAF");
             AddDefinition("RES 5,B", "CBA8");
             AddDefinition("RES 5,C", "CBA9");
@@ -1625,8 +1856,13 @@ namespace x07studio.Classes
             AddDefinition("RES 5,L", "CBAD");
 
             AddDefinition("RES 6,(HL)", "CBB6");
-            AddDefinition("RES 6,(IX+V0)", "DDCBV0B6");
-            AddDefinition("RES 6,(IY+V0)", "FDCBV0B6");
+
+            AddDefinition("RES 6,(IX+VP)", "DDCBVPB6");
+            AddDefinition("RES 6,(IY+VP)", "FDCBVPB6");
+
+            AddDefinition("RES 6,(IX-VN)", "DDCBVNB6");
+            AddDefinition("RES 6,(IY-VN)", "FDCBVNB6");
+
             AddDefinition("RES 6,A", "CBB7");
             AddDefinition("RES 6,B", "CBB0");
             AddDefinition("RES 6,C", "CBB1");
@@ -1636,8 +1872,13 @@ namespace x07studio.Classes
             AddDefinition("RES 6,L", "CBB5");
 
             AddDefinition("RES 7,(HL)", "CBBE");
-            AddDefinition("RES 7,(IX+V0)", "DDCBV0BE");
-            AddDefinition("RES 7,(IY+V0)", "FDCBV0BE");
+
+            AddDefinition("RES 7,(IX+VP)", "DDCBVPBE");
+            AddDefinition("RES 7,(IY+VP)", "FDCBVPBE");
+
+            AddDefinition("RES 7,(IX-VN)", "DDCBVNBE");
+            AddDefinition("RES 7,(IY-VN)", "FDCBVNBE");
+
             AddDefinition("RES 7,A", "CBBF");
             AddDefinition("RES 7,B", "CBB8");
             AddDefinition("RES 7,C", "CBB9");
@@ -1669,8 +1910,13 @@ namespace x07studio.Classes
             // RL
 
             AddDefinition("RL (HL)", "CB16");
-            AddDefinition("RL (IX+V0)", "DDCBV016");
-            AddDefinition("RL (IY+V0)", "FDCBV016");
+
+            AddDefinition("RL (IX+VP)", "DDCBVP16");
+            AddDefinition("RL (IY+VP)", "FDCBVP16");
+
+            AddDefinition("RL (IX-VN)", "DDCBVN16");
+            AddDefinition("RL (IY-VN)", "FDCBVN16");
+
             AddDefinition("RL A", "CB17");
             AddDefinition("RL B", "CB10");
             AddDefinition("RL C", "CB11");
@@ -1686,8 +1932,13 @@ namespace x07studio.Classes
             // RLC
 
             AddDefinition("RLC (HL)", "CB06");
-            AddDefinition("RLC (IX+V0)", "DDCBV006");
-            AddDefinition("RLC (IY+V0)", "FDCBV006");
+
+            AddDefinition("RLC (IX+VP)", "DDCBVP06");
+            AddDefinition("RLC (IY+VP)", "FDCBVP06");
+
+            AddDefinition("RLC (IX-VN)", "DDCBVN06");
+            AddDefinition("RLC (IY-VN)", "FDCBVN06");
+
             AddDefinition("RLC A", "CB07");
             AddDefinition("RLC B", "CB00");
             AddDefinition("RLC C", "CB01");
@@ -1707,8 +1958,13 @@ namespace x07studio.Classes
             // RR
 
             AddDefinition("RR (HL)", "CB1E");
-            AddDefinition("RR (IX+V0)", "DDCBV01E");
-            AddDefinition("RR (IY+V0)", "FDCBV01E");
+
+            AddDefinition("RR (IX+VP)", "DDCBVP1E");
+            AddDefinition("RR (IY+VP)", "FDCBVP1E");
+
+            AddDefinition("RR (IX-VN)", "DDCBVN1E");
+            AddDefinition("RR (IY-VN)", "FDCBVN1E");
+
             AddDefinition("RR A", "CB1F");
             AddDefinition("RR B", "CB18");
             AddDefinition("RR C", "CB19");
@@ -1724,8 +1980,13 @@ namespace x07studio.Classes
             // RRC
 
             AddDefinition("RRC (HL)", "CB0E");
-            AddDefinition("RRC (IX+V0)", "DDCBV00E");
-            AddDefinition("RRC (IY+V0)", "FDCBV00E");
+
+            AddDefinition("RRC (IX+VP)", "DDCBVP0E");
+            AddDefinition("RRC (IY+VP)", "FDCBVP0E");
+
+            AddDefinition("RRC (IX-VN)", "DDCBVN0E");
+            AddDefinition("RRC (IY-VN)", "FDCBVN0E");
+
             AddDefinition("RRC A", "CB0F");
             AddDefinition("RRC B", "CB08");
             AddDefinition("RRC C", "CB09");
@@ -1756,8 +2017,13 @@ namespace x07studio.Classes
             // SBC
 
             AddDefinition("SBC A,(HL)", "9E");
-            AddDefinition("SBC A,(IX+V0)", "DD9EV0");
-            AddDefinition("SBC A,(IY+V0)", "FD9EV0");
+
+            AddDefinition("SBC A,(IX+VP)", "DD9EVP");
+            AddDefinition("SBC A,(IY+VP)", "FD9EVP");
+
+            AddDefinition("SBC A,(IX-VN)", "DD9EVN");
+            AddDefinition("SBC A,(IY-VN)", "FD9EVN");
+
             AddDefinition("SBC A,A", "9F");
             AddDefinition("SBC A,B", "98");
             AddDefinition("SBC A,C", "99");
@@ -1778,8 +2044,13 @@ namespace x07studio.Classes
             // SET
 
             AddDefinition("SET 0,(HL)", "CBC6");
-            AddDefinition("SET 0,(IX+V0)", "DDCBV0C6");
-            AddDefinition("SET 0,(IY+V0)", "FDCBV0C6");
+
+            AddDefinition("SET 0,(IX+VP)", "DDCBVPC6");
+            AddDefinition("SET 0,(IY+VP)", "FDCBVPC6");
+
+            AddDefinition("SET 0,(IX-VN)", "DDCBVNC6");
+            AddDefinition("SET 0,(IY-VN)", "FDCBVNC6");
+
             AddDefinition("SET 0,A", "CBC7");
             AddDefinition("SET 0,B", "CBC0");
             AddDefinition("SET 0,C", "CBC1");
@@ -1789,8 +2060,13 @@ namespace x07studio.Classes
             AddDefinition("SET 0,L", "CBC5");
 
             AddDefinition("SET 1,(HL)", "CBCE");
-            AddDefinition("SET 1,(IX+V0)", "DDCBV0CE");
-            AddDefinition("SET 1,(IY+V0)", "FDCBV0CE");
+
+            AddDefinition("SET 1,(IX+VP)", "DDCBVPCE");
+            AddDefinition("SET 1,(IY+VP)", "FDCBVPCE");
+
+            AddDefinition("SET 1,(IX-VN)", "DDCBVNCE");
+            AddDefinition("SET 1,(IY-VN)", "FDCBVNCE");
+
             AddDefinition("SET 1,A", "CBCF");
             AddDefinition("SET 1,B", "CBC8");
             AddDefinition("SET 1,C", "CBC9");
@@ -1800,8 +2076,13 @@ namespace x07studio.Classes
             AddDefinition("SET 1,L", "CBCD");
 
             AddDefinition("SET 2,(HL)", "CBD6");
-            AddDefinition("SET 2,(IX+V0)", "DDCBV0D6");
-            AddDefinition("SET 2,(IY+V0)", "FDCBV0D6");
+
+            AddDefinition("SET 2,(IX+VP)", "DDCBVPD6");
+            AddDefinition("SET 2,(IY+VP)", "FDCBVPD6");
+
+            AddDefinition("SET 2,(IX-VN)", "DDCBVND6");
+            AddDefinition("SET 2,(IY-VN)", "FDCBVND6");
+
             AddDefinition("SET 2,A", "CBD7");
             AddDefinition("SET 2,B", "CBD0");
             AddDefinition("SET 2,C", "CBD1");
@@ -1811,8 +2092,13 @@ namespace x07studio.Classes
             AddDefinition("SET 2,L", "CBD5");
 
             AddDefinition("SET 3,(HL)", "CBDE");
-            AddDefinition("SET 3,(IX+V0)", "DDCBV0DE");
-            AddDefinition("SET 3,(IY+V0)", "FDCBV0DE");
+
+            AddDefinition("SET 3,(IX+VP)", "DDCBVPDE");
+            AddDefinition("SET 3,(IY+VP)", "FDCBVPDE");
+
+            AddDefinition("SET 3,(IX-VN)", "DDCBVNDE");
+            AddDefinition("SET 3,(IY-VN)", "FDCBVNDE");
+
             AddDefinition("SET 3,A", "CBDF");
             AddDefinition("SET 3,B", "CBD8");
             AddDefinition("SET 3,C", "CBD9");
@@ -1822,8 +2108,13 @@ namespace x07studio.Classes
             AddDefinition("SET 3,L", "CBDD");
 
             AddDefinition("SET 4,(HL)", "CBE6");
-            AddDefinition("SET 4,(IX+V0)", "DDCBV0E6");
-            AddDefinition("SET 4,(IY+V0)", "FDCBV0E6");
+
+            AddDefinition("SET 4,(IX+VP)", "DDCBVPE6");
+            AddDefinition("SET 4,(IY+VP)", "FDCBVPE6");
+
+            AddDefinition("SET 4,(IX-VN)", "DDCBVNE6");
+            AddDefinition("SET 4,(IY-VN)", "FDCBVNE6");
+
             AddDefinition("SET 4,A", "CBE7");
             AddDefinition("SET 4,B", "CBE0");
             AddDefinition("SET 4,C", "CBE1");
@@ -1833,8 +2124,13 @@ namespace x07studio.Classes
             AddDefinition("SET 4,L", "CBE5");
 
             AddDefinition("SET 5,(HL)", "CBEE");
-            AddDefinition("SET 5,(IX+V0)", "DDCBV0EE");
-            AddDefinition("SET 5,(IY+V0)", "FDCBV0EE");
+
+            AddDefinition("SET 5,(IX+VP)", "DDCBVPEE");
+            AddDefinition("SET 5,(IY+VP)", "FDCBVPEE");
+
+            AddDefinition("SET 5,(IX-VN)", "DDCBVNEE");
+            AddDefinition("SET 5,(IY-VN)", "FDCBVNEE");
+
             AddDefinition("SET 5,A", "CBEF");
             AddDefinition("SET 5,B", "CBE8");
             AddDefinition("SET 5,C", "CBE9");
@@ -1844,8 +2140,13 @@ namespace x07studio.Classes
             AddDefinition("SET 5,L", "CBED");
 
             AddDefinition("SET 6,(HL)", "CBF6");
-            AddDefinition("SET 6,(IX+V0)", "DDCBV0F6");
-            AddDefinition("SET 6,(IY+V0)", "FDCBV0F6");
+
+            AddDefinition("SET 6,(IX+VP)", "DDCBVPF6");
+            AddDefinition("SET 6,(IY+VP)", "FDCBVPF6");
+
+            AddDefinition("SET 6,(IX-VN)", "DDCBVNF6");
+            AddDefinition("SET 6,(IY-VN)", "FDCBVNF6");
+
             AddDefinition("SET 6,A", "CBF7");
             AddDefinition("SET 6,B", "CBF0");
             AddDefinition("SET 6,C", "CBF1");
@@ -1855,8 +2156,13 @@ namespace x07studio.Classes
             AddDefinition("SET 6,L", "CBF5");
 
             AddDefinition("SET 7,(HL)", "CBFE");
-            AddDefinition("SET 7,(IX+V0)", "DDCBV0FE");
-            AddDefinition("SET 7,(IY+V0)", "FDCBV0FE");
+
+            AddDefinition("SET 7,(IX+VP)", "DDCBVPFE");
+            AddDefinition("SET 7,(IY+VP)", "FDCBVPFE");
+
+            AddDefinition("SET 7,(IX-VN)", "DDCBVNFE");
+            AddDefinition("SET 7,(IY-VN)", "FDCBVNFE");
+
             AddDefinition("SET 7,A", "CBFF");
             AddDefinition("SET 7,B", "CBF8");
             AddDefinition("SET 7,C", "CBF9");
@@ -1881,8 +2187,13 @@ namespace x07studio.Classes
             // SRA
 
             AddDefinition("SRA (HL)", "CB2E");
-            AddDefinition("SRA (IX+V0)", "DDCBV02E");
-            AddDefinition("SRA (IY+V0)", "FDCBV02E");
+
+            AddDefinition("SRA (IX+VP)", "DDCBVP2E");
+            AddDefinition("SRA (IY+VP)", "FDCBVP2E");
+
+            AddDefinition("SRA (IX-VN)", "DDCBVN2E");
+            AddDefinition("SRA (IY-VN)", "FDCBVN2E");
+
             AddDefinition("SRA A", "CB2F");
             AddDefinition("SRA B", "CB28");
             AddDefinition("SRA C", "CB29");
@@ -1894,8 +2205,13 @@ namespace x07studio.Classes
             // SRL
 
             AddDefinition("SRL (HL)", "CB3E");
-            AddDefinition("SRL (IX+V0)", "DDCBV03E");
-            AddDefinition("SRL (IY+V0)", "FDCBV03E");
+
+            AddDefinition("SRL (IX+VP)", "DDCBVP3E");
+            AddDefinition("SRL (IY+VP)", "FDCBVP3E");
+
+            AddDefinition("SRL (IX-VN)", "DDCBVN3E");
+            AddDefinition("SRL (IY-VN)", "FDCBVN3E");
+
             AddDefinition("SRL A", "CB3F");
             AddDefinition("SRL B", "CB38");
             AddDefinition("SRL C", "CB39");
@@ -1907,8 +2223,13 @@ namespace x07studio.Classes
             // SUB
 
             AddDefinition("SUB (HL)", "96");
-            AddDefinition("SUB (IX+V0)", "DD96V0");
-            AddDefinition("SUB (IY+V0)", "FD96V0");
+
+            AddDefinition("SUB (IX+VP)", "DD96VP");
+            AddDefinition("SUB (IY+VP)", "FD96VP");
+
+            AddDefinition("SUB (IX-VN)", "DD96VN");
+            AddDefinition("SUB (IY-VN)", "FD96VN");
+
             AddDefinition("SUB A", "97");
             AddDefinition("SUB B", "90");
             AddDefinition("SUB C", "91");
@@ -1921,8 +2242,13 @@ namespace x07studio.Classes
             // XOR
 
             AddDefinition("XOR (HL)", "AE");
-            AddDefinition("XOR (IX+V0)", "DDAEV0");
-            AddDefinition("XOR (IY+V0)", "FDAEV0");
+
+            AddDefinition("XOR (IX+VP)", "DDAEVP");
+            AddDefinition("XOR (IY+VP)", "FDAEVP");
+
+            AddDefinition("XOR (IX-VN)", "DDAEVN");
+            AddDefinition("XOR (IY-VN)", "FDAEVN");
+
             AddDefinition("XOR A", "AF");
             AddDefinition("XOR B", "A8");
             AddDefinition("XOR C", "A9");
@@ -1961,8 +2287,11 @@ namespace x07studio.Classes
             {
                 Hexa = hexa;
 
-                // 2 paramètres possibles
-                // V0 et H1H2
+                // 4 paramètres possibles
+                // V0 = UINT8
+                // VP = INT8 
+                // VN = INT8
+                // H1H2 = UINT16
                 
                 var k = op.IndexOf("V0");
 
@@ -1977,23 +2306,52 @@ namespace x07studio.Classes
                 }
                 else
                 {
-                    k = op.IndexOf("H1H2");
+                    k = op.IndexOf("VP");
 
                     if (k > -1)
                     {
-                        // H1H2
+                        // VP
 
                         WithParameters = true;
-                        Parameter = "H1H2";
+                        Parameter = "VP";
                         Start = op.Substring(0, k);
-                        if (k + 4 < op.Length) End = op.Substring(k + 4);
+                        if (k + 2 < op.Length) End = op.Substring(k + 2);
                     }
                     else
                     {
-                        WithParameters = false;
-                        Start = op;
+                        k = op.IndexOf("VN");
+
+                        if (k > -1)
+                        {
+                            // VN
+
+                            WithParameters = true;
+                            Parameter = "VN";
+                            Start = op.Substring(0, k);
+                            if (k + 2 < op.Length) End = op.Substring(k + 2);
+                        }
+                        else
+                        {
+
+                            k = op.IndexOf("H1H2");
+
+                            if (k > -1)
+                            {
+                                // H1H2
+
+                                WithParameters = true;
+                                Parameter = "H1H2";
+                                Start = op.Substring(0, k);
+                                if (k + 4 < op.Length) End = op.Substring(k + 4);
+                            }
+                            else
+                            {
+                                WithParameters = false;
+                                Start = op;
+                            }
+                        }
                     }
-                }                 
+                }
             }
 
             public OpDefinition(string start, string end, string parameter, string hexa)
