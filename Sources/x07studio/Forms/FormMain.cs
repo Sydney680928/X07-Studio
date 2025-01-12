@@ -15,6 +15,15 @@ namespace x07studio.Forms
         public FormMain()
         {
             InitializeComponent();
+
+            foreach (var control in Controls)
+            { 
+                if (control is MdiClient c) 
+                {
+                    c.BackColor = Color.LightSteelBlue;
+                    break; 
+                } 
+            }
         }
 
         private void FormMain_Load(object sender, EventArgs e)
