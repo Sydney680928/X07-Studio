@@ -480,7 +480,7 @@ namespace x07studio.Classes
                             else
                             {
                                 pValueStart = operation.Start.Length;
-                                int end = line.LastIndexOf(operation.End);
+                                int end = line.ToUpper().LastIndexOf(operation.End);
                                 pValueEnd = end;
                                 pValue = line.Substring(operation.Start.Length, end - operation.Start.Length);
                             }
