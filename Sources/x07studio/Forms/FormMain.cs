@@ -20,7 +20,7 @@ namespace x07studio.Forms
             { 
                 if (control is MdiClient c) 
                 {
-                    c.BackColor = Color.LightSteelBlue;
+                    c.BackColor = Color.FromArgb(255, 93, 107, 153);
                     break; 
                 } 
             }
