@@ -48,34 +48,34 @@
             // 
             DisplayMenu.DropDownItems.AddRange(new ToolStripItem[] { DisplayProjectMenu, ProgramEditorMenu, FontEditorMenu, Z80EditorMenu });
             DisplayMenu.Name = "DisplayMenu";
-            DisplayMenu.Size = new Size(61, 22);
+            DisplayMenu.Size = new Size(89, 29);
             DisplayMenu.Text = "Afficher";
             // 
             // DisplayProjectMenu
             // 
             DisplayProjectMenu.Name = "DisplayProjectMenu";
-            DisplayProjectMenu.Size = new Size(180, 22);
+            DisplayProjectMenu.Size = new Size(275, 34);
             DisplayProjectMenu.Text = "Projet X07";
             DisplayProjectMenu.Click += DisplayProjectMenu_Click;
             // 
             // ProgramEditorMenu
             // 
             ProgramEditorMenu.Name = "ProgramEditorMenu";
-            ProgramEditorMenu.Size = new Size(180, 22);
+            ProgramEditorMenu.Size = new Size(275, 34);
             ProgramEditorMenu.Text = "Editeur BASIC";
             ProgramEditorMenu.Click += ProgramEditorMenu_Click;
             // 
             // FontEditorMenu
             // 
             FontEditorMenu.Name = "FontEditorMenu";
-            FontEditorMenu.Size = new Size(180, 22);
+            FontEditorMenu.Size = new Size(275, 34);
             FontEditorMenu.Text = "Editeur de symboles";
             FontEditorMenu.Click += FontEditorMenu_Click;
             // 
             // Z80EditorMenu
             // 
             Z80EditorMenu.Name = "Z80EditorMenu";
-            Z80EditorMenu.Size = new Size(180, 22);
+            Z80EditorMenu.Size = new Size(275, 34);
             Z80EditorMenu.Text = "Editeur Z80";
             Z80EditorMenu.Click += Z80EditorMenu_Click;
             // 
@@ -83,57 +83,56 @@
             // 
             StockageMenu.DropDownItems.AddRange(new ToolStripItem[] { LoadProgramMenu, SaveProgramMenu });
             StockageMenu.Name = "StockageMenu";
-            StockageMenu.Size = new Size(67, 22);
+            StockageMenu.Size = new Size(100, 29);
             StockageMenu.Text = "Stockage";
             // 
             // LoadProgramMenu
             // 
             LoadProgramMenu.Name = "LoadProgramMenu";
-            LoadProgramMenu.Size = new Size(213, 22);
+            LoadProgramMenu.Size = new Size(323, 34);
             LoadProgramMenu.Text = "Charger un programme";
             LoadProgramMenu.Click += LoadProgramMenu_Click;
             // 
             // SaveProgramMenu
             // 
             SaveProgramMenu.Name = "SaveProgramMenu";
-            SaveProgramMenu.Size = new Size(213, 22);
+            SaveProgramMenu.Size = new Size(323, 34);
             SaveProgramMenu.Text = "Enregistrer un programme";
             SaveProgramMenu.Click += SaveProgramMenu_Click;
             // 
             // menuStrip1
             // 
+            menuStrip1.BackColor = Color.FromArgb(204, 213, 240);
             menuStrip1.ImageScalingSize = new Size(24, 24);
             menuStrip1.Items.AddRange(new ToolStripItem[] { DisplayMenu, StockageMenu, SettingsMenu, AboutMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(4, 1, 0, 1);
-            menuStrip1.Size = new Size(1107, 24);
+            menuStrip1.Size = new Size(1581, 33);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
             // SettingsMenu
             // 
             SettingsMenu.Name = "SettingsMenu";
-            SettingsMenu.Size = new Size(87, 22);
+            SettingsMenu.Size = new Size(127, 29);
             SettingsMenu.Text = "Paramètres...";
             SettingsMenu.Click += SettingsMenu_Click;
             // 
             // AboutMenu
             // 
             AboutMenu.Name = "AboutMenu";
-            AboutMenu.Size = new Size(76, 22);
+            AboutMenu.Size = new Size(115, 29);
             AboutMenu.Text = "A propos...";
             AboutMenu.Click += AboutMenu_Click;
             // 
             // FormMain
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1107, 591);
+            ClientSize = new Size(1581, 985);
             Controls.Add(menuStrip1);
             IsMdiContainer = true;
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(2);
             Name = "FormMain";
             Text = "X07 STUDIO";
             FormClosing += FormMain_FormClosing;
