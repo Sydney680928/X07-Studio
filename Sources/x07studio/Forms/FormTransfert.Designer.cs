@@ -45,18 +45,20 @@
             // 
             MessageLabel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             MessageLabel.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            MessageLabel.Location = new Point(12, 114);
+            MessageLabel.Location = new Point(17, 190);
+            MessageLabel.Margin = new Padding(4, 0, 4, 0);
             MessageLabel.Name = "MessageLabel";
-            MessageLabel.Size = new Size(409, 66);
+            MessageLabel.Size = new Size(584, 110);
             MessageLabel.TabIndex = 0;
             MessageLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // StartButton
             // 
             StartButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            StartButton.Location = new Point(332, 188);
+            StartButton.Location = new Point(474, 313);
+            StartButton.Margin = new Padding(4, 5, 4, 5);
             StartButton.Name = "StartButton";
-            StartButton.Size = new Size(89, 28);
+            StartButton.Size = new Size(127, 47);
             StartButton.TabIndex = 1;
             StartButton.Text = "Démarrer";
             StartButton.UseVisualStyleBackColor = true;
@@ -65,9 +67,10 @@
             // CancelButton
             // 
             CancelButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            CancelButton.Location = new Point(332, 188);
+            CancelButton.Location = new Point(474, 313);
+            CancelButton.Margin = new Padding(4, 5, 4, 5);
             CancelButton.Name = "CancelButton";
-            CancelButton.Size = new Size(89, 28);
+            CancelButton.Size = new Size(127, 47);
             CancelButton.TabIndex = 2;
             CancelButton.Text = "Annuler";
             CancelButton.UseVisualStyleBackColor = true;
@@ -77,18 +80,21 @@
             // TransfertProgress
             // 
             TransfertProgress.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            TransfertProgress.Location = new Point(12, 191);
+            TransfertProgress.BackColor = SystemColors.Control;
+            TransfertProgress.Location = new Point(17, 318);
+            TransfertProgress.Margin = new Padding(4, 5, 4, 5);
             TransfertProgress.Name = "TransfertProgress";
-            TransfertProgress.Size = new Size(314, 23);
+            TransfertProgress.Size = new Size(449, 38);
             TransfertProgress.TabIndex = 3;
             TransfertProgress.Visible = false;
             // 
             // pictureBox3
             // 
             pictureBox3.Image = (Image)resources.GetObject("pictureBox3.Image");
-            pictureBox3.Location = new Point(164, 12);
+            pictureBox3.Location = new Point(234, 20);
+            pictureBox3.Margin = new Padding(4, 5, 4, 5);
             pictureBox3.Name = "pictureBox3";
-            pictureBox3.Size = new Size(108, 89);
+            pictureBox3.Size = new Size(154, 148);
             pictureBox3.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox3.TabIndex = 9;
             pictureBox3.TabStop = false;
@@ -96,9 +102,10 @@
             // pictureBox2
             // 
             pictureBox2.Image = (Image)resources.GetObject("pictureBox2.Image");
-            pictureBox2.Location = new Point(12, 12);
+            pictureBox2.Location = new Point(17, 20);
+            pictureBox2.Margin = new Padding(4, 5, 4, 5);
             pictureBox2.Name = "pictureBox2";
-            pictureBox2.Size = new Size(146, 89);
+            pictureBox2.Size = new Size(209, 148);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox2.TabIndex = 8;
             pictureBox2.TabStop = false;
@@ -106,18 +113,19 @@
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(278, 12);
+            pictureBox1.Location = new Point(397, 20);
+            pictureBox1.Margin = new Padding(4, 5, 4, 5);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(146, 89);
+            pictureBox1.Size = new Size(209, 148);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 7;
             pictureBox1.TabStop = false;
             // 
             // FormTransfert
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(433, 223);
+            ClientSize = new Size(619, 372);
             Controls.Add(pictureBox3);
             Controls.Add(pictureBox2);
             Controls.Add(pictureBox1);
@@ -126,6 +134,7 @@
             Controls.Add(StartButton);
             Controls.Add(MessageLabel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding(4, 5, 4, 5);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormTransfert";

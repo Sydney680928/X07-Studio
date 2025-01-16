@@ -48,7 +48,7 @@
             // 
             DisplayMenu.DropDownItems.AddRange(new ToolStripItem[] { DisplayProjectMenu, ProgramEditorMenu, FontEditorMenu, Z80EditorMenu });
             DisplayMenu.Name = "DisplayMenu";
-            DisplayMenu.Size = new Size(89, 29);
+            DisplayMenu.Size = new Size(89, 40);
             DisplayMenu.Text = "Afficher";
             // 
             // DisplayProjectMenu
@@ -83,7 +83,7 @@
             // 
             StockageMenu.DropDownItems.AddRange(new ToolStripItem[] { LoadProgramMenu, SaveProgramMenu });
             StockageMenu.Name = "StockageMenu";
-            StockageMenu.Size = new Size(100, 29);
+            StockageMenu.Size = new Size(100, 40);
             StockageMenu.Text = "Stockage";
             // 
             // LoadProgramMenu
@@ -102,26 +102,28 @@
             // 
             // menuStrip1
             // 
+            menuStrip1.AutoSize = false;
             menuStrip1.BackColor = Color.FromArgb(204, 213, 240);
             menuStrip1.ImageScalingSize = new Size(24, 24);
             menuStrip1.Items.AddRange(new ToolStripItem[] { DisplayMenu, StockageMenu, SettingsMenu, AboutMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1581, 33);
+            menuStrip1.Padding = new Padding(6, 5, 0, 5);
+            menuStrip1.Size = new Size(1581, 50);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
             // SettingsMenu
             // 
             SettingsMenu.Name = "SettingsMenu";
-            SettingsMenu.Size = new Size(127, 29);
+            SettingsMenu.Size = new Size(127, 40);
             SettingsMenu.Text = "Paramètres...";
             SettingsMenu.Click += SettingsMenu_Click;
             // 
             // AboutMenu
             // 
             AboutMenu.Name = "AboutMenu";
-            AboutMenu.Size = new Size(115, 29);
+            AboutMenu.Size = new Size(115, 40);
             AboutMenu.Text = "A propos...";
             AboutMenu.Click += AboutMenu_Click;
             // 
@@ -141,7 +143,6 @@
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
