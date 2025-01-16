@@ -48,14 +48,14 @@
             MessageLabel.Location = new Point(17, 190);
             MessageLabel.Margin = new Padding(4, 0, 4, 0);
             MessageLabel.Name = "MessageLabel";
-            MessageLabel.Size = new Size(584, 110);
+            MessageLabel.Size = new Size(584, 181);
             MessageLabel.TabIndex = 0;
             MessageLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // StartButton
             // 
             StartButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            StartButton.Location = new Point(474, 313);
+            StartButton.Location = new Point(474, 384);
             StartButton.Margin = new Padding(4, 5, 4, 5);
             StartButton.Name = "StartButton";
             StartButton.Size = new Size(127, 47);
@@ -67,7 +67,7 @@
             // CancelButton
             // 
             CancelButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            CancelButton.Location = new Point(474, 313);
+            CancelButton.Location = new Point(474, 384);
             CancelButton.Margin = new Padding(4, 5, 4, 5);
             CancelButton.Name = "CancelButton";
             CancelButton.Size = new Size(127, 47);
@@ -81,7 +81,7 @@
             // 
             TransfertProgress.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             TransfertProgress.BackColor = SystemColors.Control;
-            TransfertProgress.Location = new Point(17, 318);
+            TransfertProgress.Location = new Point(17, 389);
             TransfertProgress.Margin = new Padding(4, 5, 4, 5);
             TransfertProgress.Name = "TransfertProgress";
             TransfertProgress.Size = new Size(449, 38);
@@ -125,7 +125,7 @@
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(619, 372);
+            ClientSize = new Size(619, 443);
             Controls.Add(pictureBox3);
             Controls.Add(pictureBox2);
             Controls.Add(pictureBox1);

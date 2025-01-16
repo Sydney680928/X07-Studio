@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using System.Xml.Serialization;
 using x07studio.Classes;
@@ -114,8 +115,16 @@ namespace x07studio.Forms
             SerialManager.Default.Open(Properties.Settings.Default.PortName, 4800);
         }
 
-        private void AboutMenu_Click(object sender, EventArgs e)
+        private async void AboutMenu_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            var r = new Random();
+            var l = (UInt16)r.Next(100, 5000);
+            var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800,0x1000, l);
+            Debug.WriteLine($"DUMP {bytes.Length}");
+            return;
+#endif
+
             var f = new FormAbout();
             f.ShowDialog(this);
             Application.DoEvents();

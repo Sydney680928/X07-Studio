@@ -45,8 +45,10 @@ namespace x07studio.Classes
                     Handshake = Handshake.RequestToSend,
                     DiscardNull = false,
                     Encoding = Encoding.ASCII,
-                    ReadBufferSize = 64,
-                    WriteBufferSize = 64,
+                    ReadBufferSize = 8196,
+                    WriteBufferSize = 16,
+                    ReadTimeout = 5000,
+                    WriteTimeout = 2000
                 };
 
 
@@ -111,7 +113,7 @@ namespace x07studio.Classes
 
         }
 
-        public void SendCommand(string command)
+        public bool SendCommand(string command)
         {
             if (!string.IsNullOrEmpty(command) && _SerialPort != null && _SerialPort.IsOpen)
             {
@@ -122,7 +124,76 @@ namespace x07studio.Classes
 
                 _SerialPort.Write(b2, 0, b2.Length);
                 _SerialPort.Write("\r");
+
+                return true;
             }
+
+            return false;
+        }
+
+        public Task<byte[]> GetDumpAsync(string portname, int baudrate,UInt16 address, UInt16 length)
+        {
+            var tcs = new TaskCompletionSource<byte[]>();
+
+            Task.Run(() =>
+            {
+                if (Open(portname, 4800))
+                {
+                    var command = $"D:{address:X4},{length:X4}";
+
+                    if (_SerialPort != null && SendCommand(command))
+                    {
+                        try
+                        {
+                            var t0 = _SerialPort.ReadTimeout;
+
+                            _SerialPort.ReadTimeout = length * 30;
+                            if (_SerialPort.ReadTimeout < 2000) _SerialPort.ReadTimeout = 2000;
+                            
+                            var s = _SerialPort.ReadLine();
+                            s = s.Replace("\r", "");
+
+                            _SerialPort.ReadTimeout = t0;
+
+                            var bytes = new byte[s.Length / 2];
+                            int i, j;
+
+                            for (i = 0, j = 0; i < s.Length; i += 2, j++)
+                            {
+                                var sb = s.Substring(i, 2);
+
+                                if (byte.TryParse(sb,System.Globalization.NumberStyles.HexNumber,null,  out var v))
+                                {
+                                    bytes[j] = v;
+                                }
+                                else
+                                {
+                                    // Erreur de conversion, sortie !
+
+                                    tcs.SetResult([]);
+                                    return;
+                                }
+                            }
+
+                            tcs.SetResult(bytes);
+                        }
+                        catch (TimeoutException ex)
+                        {
+                            // Pas de réponse
+
+                            tcs.SetResult([]);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Erreur autre que timeout
+
+                            tcs.SetResult([]);
+                        }
+                    }
+                }
+            });
+
+            return tcs.Task;    
         }
 
         private GetProgramResponse ScanInBuffer(int timeout)
@@ -216,6 +287,7 @@ namespace x07studio.Classes
                 };
             }
         }
+
 
         private string ToHex(byte[] bytes)
         {

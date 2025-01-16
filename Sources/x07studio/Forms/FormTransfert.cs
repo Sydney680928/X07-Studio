@@ -67,7 +67,7 @@ namespace x07studio.Forms
             }
             else
             {
-                MessageLabel.Text = "Veuillez placer le X07 en mode esclave puis appuyez sur le bouton [Démarrer]...";
+                MessageLabel.Text = "Veuillez placer le X07 en mode esclave avec la commande\nINIT #5,\"COM:\":EXEC &&HEE1F\npuis appuyer sur le bouton [Démarrer]...";
             }
         }
 
