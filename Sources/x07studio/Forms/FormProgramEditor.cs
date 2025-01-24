@@ -20,6 +20,7 @@ namespace x07studio.Forms
         public FormProgramEditor()
         {
             InitializeComponent();
+
             InitializeCodeEditor();
             UpdateTitleFromProgram();
         }
@@ -331,5 +332,9 @@ namespace x07studio.Forms
             StatementsComboBox.Items.AddRange(items);
         }
 
+        private void FormProgramEditor_Shown(object sender, EventArgs e)
+        {
+            Application.DoEvents();
+        }
     }
 }
