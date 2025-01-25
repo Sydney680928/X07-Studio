@@ -18,12 +18,12 @@ namespace x07studio.Forms
             InitializeComponent();
 
             foreach (var control in Controls)
-            { 
-                if (control is MdiClient c) 
+            {
+                if (control is MdiClient c)
                 {
                     c.BackColor = Color.FromArgb(255, 93, 107, 153);
-                    break; 
-                } 
+                    break;
+                }
             }
         }
 
@@ -120,7 +120,7 @@ namespace x07studio.Forms
 #if DEBUG
             var r = new Random();
             var l = (UInt16)r.Next(100, 5000);
-            var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800,0x1000, l);
+            var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800, 0x1000, l);
             Debug.WriteLine($"DUMP {bytes.Length}");
             return;
 #endif
@@ -128,6 +128,13 @@ namespace x07studio.Forms
             var f = new FormAbout();
             f.ShowDialog(this);
             Application.DoEvents();
+        }
+
+        private void MemoryManagerMenu_Click(object sender, EventArgs e)
+        {
+            var f = new FormDump();
+            f.MdiParent = this;
+            f.Show();
         }
     }
 }
