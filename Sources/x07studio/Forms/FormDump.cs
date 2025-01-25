@@ -24,21 +24,47 @@ namespace x07studio.Forms
         {
             DumpButton.Enabled = false;
 
-            var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800, 0, 512);
-            Debug.WriteLine($"DUMP {bytes.Length}");
+            var addr = ParseValue(AddressTextBox.Text);
 
-            OutputTextBox.Text = OutputDumpBytes(bytes);
+            if (addr != null)
+            {
+                var size = ParseValue(DumpSizeTextBox.Text);
+
+                if (size != null)
+                {
+                    var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800, addr.Value, size.Value);
+
+                    if (bytes.Length > 0)
+                    {
+                        OutputTextBox.Text = OutputDumpBytes(bytes, 0x1000);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Une erreur s'est produite pendant le transfert des données !");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Veuillez saisir une longueur valide !");
+                    DumpSizeTextBox.Focus();
+                }
+            }
+            else
+            {
+                MessageBox.Show("Veuillez saisir une adresse valide !");
+                AddressTextBox.Focus();
+            }
 
             DumpButton.Enabled = true;
         }
 
-        private string OutputDumpBytes(byte[] bytes)
+        private string OutputDumpBytes(byte[] bytes, UInt16 baseAddress)
         {
             var sb = new StringBuilder();
 
             for (int i = 0; i < bytes.Length; i += 16)
             {
-                sb.Append(string.Format("{0:X4}  ", i));
+                sb.Append(string.Format("{0:X4}  ", i + baseAddress));
 
                 for (int j = i; j < i + 16; j++)
                 {
@@ -56,14 +82,14 @@ namespace x07studio.Forms
                     {
                         var v = bytes[j];
                         
-                        if (v < 32)
+                        if (v < 32 || v > 126)
                         {
                             c = ".";
                         }
                         else
                         {
                             byte[] b = [v];
-                            c = Encoding.ASCII.GetString(b);    
+                            c = Encoding.GetEncoding(28591).GetString(b);
                         }
                     }
 
@@ -74,6 +100,29 @@ namespace x07studio.Forms
             }
 
             return sb.ToString();
+        }
+
+        private UInt16? ParseValue(string value)
+        {
+            // $300 --> 0x300
+            // 300 --> 300
+
+            if (value.StartsWith("$"))
+            {
+                if (UInt16.TryParse(value.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out var result))
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                if (UInt16.TryParse(value, null, out var result))
+                {
+                    return result;
+                }
+            }
+
+            return null;
         }
     }
 }

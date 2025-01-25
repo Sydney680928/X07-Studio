@@ -38,11 +38,13 @@
             // 
             OutputTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             OutputTextBox.BorderStyle = BorderStyle.FixedSingle;
-            OutputTextBox.Font = new Font("Consolas", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            OutputTextBox.Font = new Font("Consolas", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             OutputTextBox.Location = new Point(12, 12);
             OutputTextBox.Multiline = true;
             OutputTextBox.Name = "OutputTextBox";
             OutputTextBox.ReadOnly = true;
+            OutputTextBox.ScrollBars = ScrollBars.Vertical;
+            OutputTextBox.ShortcutsEnabled = false;
             OutputTextBox.Size = new Size(776, 352);
             OutputTextBox.TabIndex = 0;
             OutputTextBox.WordWrap = false;
