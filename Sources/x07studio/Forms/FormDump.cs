@@ -32,11 +32,11 @@ namespace x07studio.Forms
 
                 if (size != null)
                 {
-                    var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800, addr.Value, size.Value);
+                    var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800, addr.Value, size.Value, TransferProgressBar);
 
                     if (bytes.Length > 0)
                     {
-                        OutputTextBox.Text = OutputDumpBytes(bytes, 0x1000);
+                        OutputTextBox.Text = OutputDumpBytes(bytes, addr.Value);
                     }
                     else
                     {

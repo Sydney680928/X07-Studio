@@ -44,7 +44,8 @@ namespace x07studio.Classes
                     DataBits = 8,
                     Handshake = Handshake.RequestToSend,
                     DiscardNull = false,
-                    Encoding = Encoding.ASCII,
+                    //Encoding = Encoding.ASCII,
+                    Encoding = Encoding.GetEncoding(28591),
                     ReadBufferSize = 8196,
                     WriteBufferSize = 16,
                     ReadTimeout = 5000,
@@ -122,16 +123,22 @@ namespace x07studio.Classes
                 int i, j;
                 for (i = 0, j = 0; i < bytes.Length; i += 2, j++) b2[j] = bytes[i];
 
-                _SerialPort.Write(b2, 0, b2.Length);
-                _SerialPort.Write("\r");
+                try
+                {
+                    _SerialPort.Write(b2, 0, b2.Length);
+                    _SerialPort.Write("\r");
+                    return true;
+                }
+                catch (Exception ex)
+                {
 
-                return true;
+                }
             }
 
             return false;
         }
 
-        public Task<byte[]> GetDumpAsync(string portname, int baudrate,UInt16 address, UInt16 length)
+        public Task<byte[]> GetDumpAsync(string portname, int baudrate,UInt16 address, UInt16 length, ProgressBar? progress = null)
         {
             var tcs = new TaskCompletionSource<byte[]>();
 
@@ -143,36 +150,41 @@ namespace x07studio.Classes
 
                     if (_SerialPort != null && SendCommand(command))
                     {
+                        if (progress != null && progress.IsHandleCreated)
+                        {
+                            progress.Invoke(() =>
+                            {
+                                progress.Value = 0;
+                                progress.Minimum = 0;
+                                progress.Maximum = length;
+                            });
+                        }
+
                         try
                         {
-                            var t0 = _SerialPort.ReadTimeout;
+                            var bytes = new byte[length];
+                            var index = 0;
 
-                            _SerialPort.ReadTimeout = length * 30;
-                            if (_SerialPort.ReadTimeout < 2000) _SerialPort.ReadTimeout = 2000;
-                            
-                            var s = _SerialPort.ReadLine();
-                            s = s.Replace("\r", "");
-
-                            _SerialPort.ReadTimeout = t0;
-
-                            var bytes = new byte[s.Length / 2];
-                            int i, j;
-
-                            for (i = 0, j = 0; i < s.Length; i += 2, j++)
+                            while (index < length)
                             {
-                                var sb = s.Substring(i, 2);
+                                bytes[index] = (byte)_SerialPort.ReadByte();
+                                index += 1;
 
-                                if (byte.TryParse(sb,System.Globalization.NumberStyles.HexNumber,null,  out var v))
+                                if (progress != null && progress.IsHandleCreated && index % 50 == 0)
                                 {
-                                    bytes[j] = v;
+                                    progress.Invoke(() =>
+                                    {
+                                        progress.Value = index;
+                                    });
                                 }
-                                else
-                                {
-                                    // Erreur de conversion, sortie !
+                            }
 
-                                    tcs.SetResult([]);
-                                    return;
-                                }
+                            if (progress != null)
+                            {
+                                progress.Invoke(() =>
+                                {
+                                    progress.Value = progress.Maximum;
+                                });
                             }
 
                             tcs.SetResult(bytes);
@@ -188,6 +200,19 @@ namespace x07studio.Classes
                             // Erreur autre que timeout
 
                             tcs.SetResult([]);
+                        }
+                        finally
+                        {
+                            if (progress != null && progress.IsHandleCreated)
+                            {
+                                Thread.Sleep(1000);
+
+                                progress.Invoke(() =>
+                                {
+                                    progress.Value = 0;
+                                    progress.Minimum = 0;
+                                });
+                            }
                         }
                     }
                 }

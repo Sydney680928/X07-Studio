@@ -39,9 +39,9 @@ namespace x07studio.Forms
 
                 for (var i = 0; i < lines.Length; i++)
                 {
-                    SerialManager.Default.SendCommand(lines[i]);
+                    var r = SerialManager.Default.SendCommand(lines[i]);
 
-                    if (_RequestStopTransfert) break;
+                    if (_RequestStopTransfert || !r) break;
 
                     percent = (int)(((double)i / (double)lines.Length) * 100.0);
 
