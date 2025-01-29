@@ -329,5 +329,10 @@ namespace x07studio.Forms
         {
             Application.DoEvents();
         }
+
+        private void PrintMenu_Click(object sender, EventArgs e)
+        {
+            FormMain.Default.PrintDocument(CodeEditor);
+        }
     }
 }

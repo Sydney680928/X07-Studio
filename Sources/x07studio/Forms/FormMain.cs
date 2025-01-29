@@ -1,3 +1,4 @@
+using ICSharpCode.TextEditor;
 using System.Diagnostics;
 using System.Text;
 using System.Xml.Serialization;
@@ -25,6 +26,24 @@ namespace x07studio.Forms
                     break;
                 }
             }
+        }
+
+        public bool PrintDocument(TextEditorControl editor)
+        {
+            PrintDialog printDialog = new PrintDialog();
+            printDialog.Document = editor.PrintDocument;
+            printDialog.UseEXDialog = true;
+
+            var r = printDialog.ShowDialog();
+
+            if (r == DialogResult.OK)
+            {
+                editor.PrintDocument.PrinterSettings = printDialog.PrinterSettings;
+                editor.PrintDocument.Print();
+                return true;
+            }
+
+            return false;
         }
 
         private void FormMain_Load(object sender, EventArgs e)

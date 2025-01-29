@@ -47,6 +47,7 @@
             ComputerPage = new TabPage();
             AsmListView = new ListView();
             Column5 = new ColumnHeader();
+            PrintMenu = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
             Column0 = new ColumnHeader();
             Column1 = new ColumnHeader();
@@ -75,7 +76,7 @@
             // 
             // fichierToolStripMenuItem
             // 
-            fichierToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { FileNewMenu, FileOpenMenu, FileSaveMenu, FileSaveAsMenu });
+            fichierToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { FileNewMenu, FileOpenMenu, FileSaveMenu, FileSaveAsMenu, PrintMenu });
             fichierToolStripMenuItem.Name = "fichierToolStripMenuItem";
             fichierToolStripMenuItem.Size = new Size(78, 40);
             fichierToolStripMenuItem.Text = "Fichier";
@@ -83,28 +84,28 @@
             // FileNewMenu
             // 
             FileNewMenu.Name = "FileNewMenu";
-            FileNewMenu.Size = new Size(246, 34);
+            FileNewMenu.Size = new Size(270, 34);
             FileNewMenu.Text = "Nouveau";
             FileNewMenu.Click += FileNewMenu_Click;
             // 
             // FileOpenMenu
             // 
             FileOpenMenu.Name = "FileOpenMenu";
-            FileOpenMenu.Size = new Size(246, 34);
+            FileOpenMenu.Size = new Size(270, 34);
             FileOpenMenu.Text = "Ouvrir...";
             FileOpenMenu.Click += FileOpenMenu_Click;
             // 
             // FileSaveMenu
             // 
             FileSaveMenu.Name = "FileSaveMenu";
-            FileSaveMenu.Size = new Size(246, 34);
+            FileSaveMenu.Size = new Size(270, 34);
             FileSaveMenu.Text = "Enregistrer";
             FileSaveMenu.Click += FileSaveMenu_Click;
             // 
             // FileSaveAsMenu
             // 
             FileSaveAsMenu.Name = "FileSaveAsMenu";
-            FileSaveAsMenu.Size = new Size(246, 34);
+            FileSaveAsMenu.Size = new Size(270, 34);
             FileSaveAsMenu.Text = "Enregister sous...";
             FileSaveAsMenu.Click += FileSaveAsMenu_Click;
             // 
@@ -210,6 +211,13 @@
             // 
             Column5.Text = "";
             // 
+            // PrintMenu
+            // 
+            PrintMenu.Name = "PrintMenu";
+            PrintMenu.Size = new Size(270, 34);
+            PrintMenu.Text = "Imprimer";
+            PrintMenu.Click += PrintMenu_Click;
+            // 
             // FormAsmEditor
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
@@ -248,5 +256,6 @@
         private ColumnHeader Column2;
         private ToolStripMenuItem CreateLoaderMenu;
         private ColumnHeader Column5;
+        private ToolStripMenuItem PrintMenu;
     }
 }

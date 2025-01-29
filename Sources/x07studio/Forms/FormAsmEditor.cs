@@ -329,7 +329,7 @@ namespace x07studio.Forms
                 sb.AppendLine($"Ligne {_CurrentAssembleResult.ErrorLine + 1}");
                 sb.AppendLine(_CurrentAssembleResult.ErrorCode);
 
-                MessageBox.Show(this,sb.ToString(), "X07 STUDIO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show(this, sb.ToString(), "X07 STUDIO", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
                 SelectLine(_CurrentAssembleResult.ErrorLine + 1);
             }
@@ -352,6 +352,11 @@ namespace x07studio.Forms
                 f.MdiParent = FormMain.Default;
                 f.Show();
             }
+        }
+
+        private void PrintMenu_Click(object sender, EventArgs e)
+        {
+            FormMain.Default.PrintDocument(CodeEditor);
         }
     }
 }

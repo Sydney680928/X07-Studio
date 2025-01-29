@@ -37,6 +37,7 @@
             GenerateMenu = new ToolStripMenuItem();
             CodeEditor = new ICSharpCode.TextEditor.TextEditorControl();
             StatementsComboBox = new ComboBox();
+            PrintMenu = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -50,50 +51,50 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { fichierToolStripMenuItem, GenerateMenu });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Padding = new Padding(6, 3, 0, 3);
-            menuStrip1.Size = new Size(660, 30);
+            menuStrip1.Padding = new Padding(9, 5, 0, 5);
+            menuStrip1.Size = new Size(943, 50);
             menuStrip1.TabIndex = 2;
             menuStrip1.Text = "menuStrip1";
             // 
             // fichierToolStripMenuItem
             // 
-            fichierToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { FileNewMenu, FileOpenMenu, FileSaveMenu, FileSaveAsMenu });
+            fichierToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { FileNewMenu, FileOpenMenu, FileSaveMenu, FileSaveAsMenu, PrintMenu });
             fichierToolStripMenuItem.Name = "fichierToolStripMenuItem";
-            fichierToolStripMenuItem.Size = new Size(54, 24);
+            fichierToolStripMenuItem.Size = new Size(78, 40);
             fichierToolStripMenuItem.Text = "Fichier";
             // 
             // FileNewMenu
             // 
             FileNewMenu.Name = "FileNewMenu";
-            FileNewMenu.Size = new Size(162, 22);
+            FileNewMenu.Size = new Size(270, 34);
             FileNewMenu.Text = "Nouveau";
             FileNewMenu.Click += FileNewMenu_Click;
             // 
             // FileOpenMenu
             // 
             FileOpenMenu.Name = "FileOpenMenu";
-            FileOpenMenu.Size = new Size(162, 22);
+            FileOpenMenu.Size = new Size(270, 34);
             FileOpenMenu.Text = "Ouvrir...";
             FileOpenMenu.Click += FileOpenMenu_Click;
             // 
             // FileSaveMenu
             // 
             FileSaveMenu.Name = "FileSaveMenu";
-            FileSaveMenu.Size = new Size(162, 22);
+            FileSaveMenu.Size = new Size(270, 34);
             FileSaveMenu.Text = "Enregistrer";
             FileSaveMenu.Click += FileSaveMenu_Click;
             // 
             // FileSaveAsMenu
             // 
             FileSaveAsMenu.Name = "FileSaveAsMenu";
-            FileSaveAsMenu.Size = new Size(162, 22);
+            FileSaveAsMenu.Size = new Size(270, 34);
             FileSaveAsMenu.Text = "Enregister sous...";
             FileSaveAsMenu.Click += FileSaveAsMenu_Click;
             // 
             // GenerateMenu
             // 
             GenerateMenu.Name = "GenerateMenu";
-            GenerateMenu.Size = new Size(60, 24);
+            GenerateMenu.Size = new Size(89, 40);
             GenerateMenu.Text = "Générer";
             GenerateMenu.Click += GenerateMenu_Click;
             // 
@@ -103,10 +104,9 @@
             CodeEditor.BorderStyle = BorderStyle.FixedSingle;
             CodeEditor.Font = new Font("Consolas", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             CodeEditor.IsReadOnly = false;
-            CodeEditor.Location = new Point(11, 72);
-            CodeEditor.Margin = new Padding(2, 2, 2, 2);
+            CodeEditor.Location = new Point(16, 120);
             CodeEditor.Name = "CodeEditor";
-            CodeEditor.Size = new Size(638, 331);
+            CodeEditor.Size = new Size(911, 550);
             CodeEditor.TabIndex = 0;
             CodeEditor.TextChanged += CodeEditor_TextChanged;
             // 
@@ -116,24 +116,29 @@
             StatementsComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
             StatementsComboBox.FlatStyle = FlatStyle.System;
             StatementsComboBox.FormattingEnabled = true;
-            StatementsComboBox.Location = new Point(11, 41);
-            StatementsComboBox.Margin = new Padding(2, 2, 2, 2);
+            StatementsComboBox.Location = new Point(16, 68);
             StatementsComboBox.Name = "StatementsComboBox";
-            StatementsComboBox.Size = new Size(640, 23);
+            StatementsComboBox.Size = new Size(913, 33);
             StatementsComboBox.Sorted = true;
             StatementsComboBox.TabIndex = 1;
             StatementsComboBox.SelectedIndexChanged += StatementsComboBox_SelectedIndexChanged;
             // 
+            // PrintMenu
+            // 
+            PrintMenu.Name = "PrintMenu";
+            PrintMenu.Size = new Size(270, 34);
+            PrintMenu.Text = "Imprimer";
+            PrintMenu.Click += PrintMenu_Click;
+            // 
             // FormProject
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(660, 412);
+            ClientSize = new Size(943, 687);
             Controls.Add(StatementsComboBox);
             Controls.Add(CodeEditor);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(2, 2, 2, 2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "FormProject";
@@ -157,5 +162,6 @@
         private ToolStripMenuItem FileSaveMenu;
         private ToolStripMenuItem FileSaveAsMenu;
         private ToolStripMenuItem GenerateMenu;
+        private ToolStripMenuItem PrintMenu;
     }
 }
