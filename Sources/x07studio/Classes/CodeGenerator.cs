@@ -176,8 +176,15 @@ namespace x07studio.Classes
                             '$' => "$",
                             '%' => "%",
                             '#' => "#",
+                            '!' => "!",
                             _ => "@"
                         };
+
+                        if (varType == "@")
+                        {
+                            varName += "#";
+                            varType = "#";
+                        }
 
                         if (vars[varType].Contains(varName)) return new(ResultStatusEnum.DuplicateVarDefinition, lineNumber, line);
 
@@ -298,7 +305,7 @@ namespace x07studio.Classes
                     "%" => "%",
                     "!" => "!",
                     "#" => "#",
-                    _ => ""
+                    _ => "#"
                 };
 
                 var varList = vars[varType];
@@ -330,13 +337,13 @@ namespace x07studio.Classes
                     "%" => "%",
                     "!" => "!",
                     "#" => "#",
-                    _ => ""
+                    _ => "#"
                 };
 
                 var varList = vars[varType];
 
                 // On trie les variables de celles avec le plus grand nom à celle avec le plus petit nom
-                // Sans cet ordre des soucis de remplacement partiels apparaissent avec des varables dont le nom est proce
+                // Sans cet ordre des soucis de remplacement partiels apparaissent avec des varables dont le nom est proche
                 // Ex SCORE% et DISPLAY_SCORE% par exemple
 
                 varList.Sort();
