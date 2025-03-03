@@ -48,9 +48,9 @@ namespace x07studio.Classes
 
                 if (line.Length > 0)
                 {
-                    // Les lignes de plus de 80 caractères ne sont pas supportées
+                    // Les lignes de plus de 160 caractères ne sont pas supportées
 
-                    if (line.Length > 80)
+                    if (line.Length > 160)
                     {
                         return new GeneratorResult(ResultStatusEnum.LineTooLong, lineNumber, line);
                     }
