@@ -51,16 +51,17 @@
             HexTextBox.Location = new Point(12, 31);
             HexTextBox.Multiline = true;
             HexTextBox.Name = "HexTextBox";
-            HexTextBox.Size = new Size(456, 424);
+            HexTextBox.Size = new Size(536, 336);
             HexTextBox.TabIndex = 0;
             // 
             // GenerateButton
             // 
-            GenerateButton.Location = new Point(377, 461);
+            GenerateButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            GenerateButton.Location = new Point(361, 380);
             GenerateButton.Name = "GenerateButton";
-            GenerateButton.Size = new Size(91, 35);
+            GenerateButton.Size = new Size(187, 35);
             GenerateButton.TabIndex = 2;
-            GenerateButton.Text = "Générer";
+            GenerateButton.Text = "Générer le chargeur";
             GenerateButton.UseVisualStyleBackColor = true;
             GenerateButton.Click += GenerateButton_Click;
             // 
@@ -68,13 +69,15 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(480, 510);
+            ClientSize = new Size(560, 422);
             Controls.Add(GenerateButton);
             Controls.Add(label1);
             Controls.Add(HexTextBox);
             Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             MaximizeBox = false;
+            MaximumSize = new Size(688, 611);
             MinimizeBox = false;
+            MinimumSize = new Size(496, 305);
             Name = "FormAsmLoader";
             Text = "Chargeur de code machine";
             ResumeLayout(false);
