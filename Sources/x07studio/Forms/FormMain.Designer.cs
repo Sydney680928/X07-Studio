@@ -34,12 +34,13 @@
             ProgramEditorMenu = new ToolStripMenuItem();
             FontEditorMenu = new ToolStripMenuItem();
             Z80EditorMenu = new ToolStripMenuItem();
+            MemoryManagerMenu = new ToolStripMenuItem();
             LoadProgramMenu = new ToolStripMenuItem();
             SaveProgramMenu = new ToolStripMenuItem();
             menuStrip1 = new MenuStrip();
             SettingsMenu = new ToolStripMenuItem();
             AboutMenu = new ToolStripMenuItem();
-            MemoryManagerMenu = new ToolStripMenuItem();
+            AsmLoaderMenu = new ToolStripMenuItem();
             DisplayMenu = new ToolStripMenuItem();
             StockageMenu = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
@@ -47,7 +48,7 @@
             // 
             // DisplayMenu
             // 
-            DisplayMenu.DropDownItems.AddRange(new ToolStripItem[] { DisplayProjectMenu, ProgramEditorMenu, FontEditorMenu, Z80EditorMenu, MemoryManagerMenu });
+            DisplayMenu.DropDownItems.AddRange(new ToolStripItem[] { DisplayProjectMenu, ProgramEditorMenu, FontEditorMenu, Z80EditorMenu, AsmLoaderMenu, MemoryManagerMenu });
             DisplayMenu.Name = "DisplayMenu";
             DisplayMenu.Size = new Size(61, 24);
             DisplayMenu.Text = "Afficher";
@@ -55,30 +56,38 @@
             // DisplayProjectMenu
             // 
             DisplayProjectMenu.Name = "DisplayProjectMenu";
-            DisplayProjectMenu.Size = new Size(207, 22);
+            DisplayProjectMenu.Size = new Size(217, 22);
             DisplayProjectMenu.Text = "Projet X07";
             DisplayProjectMenu.Click += DisplayProjectMenu_Click;
             // 
             // ProgramEditorMenu
             // 
             ProgramEditorMenu.Name = "ProgramEditorMenu";
-            ProgramEditorMenu.Size = new Size(207, 22);
+            ProgramEditorMenu.Size = new Size(217, 22);
             ProgramEditorMenu.Text = "Editeur BASIC";
             ProgramEditorMenu.Click += ProgramEditorMenu_Click;
             // 
             // FontEditorMenu
             // 
             FontEditorMenu.Name = "FontEditorMenu";
-            FontEditorMenu.Size = new Size(207, 22);
+            FontEditorMenu.Size = new Size(217, 22);
             FontEditorMenu.Text = "Editeur de symboles";
             FontEditorMenu.Click += FontEditorMenu_Click;
             // 
             // Z80EditorMenu
             // 
             Z80EditorMenu.Name = "Z80EditorMenu";
-            Z80EditorMenu.Size = new Size(207, 22);
+            Z80EditorMenu.Size = new Size(217, 22);
             Z80EditorMenu.Text = "Editeur Z80";
             Z80EditorMenu.Click += Z80EditorMenu_Click;
+            // 
+            // MemoryManagerMenu
+            // 
+            MemoryManagerMenu.Name = "MemoryManagerMenu";
+            MemoryManagerMenu.Size = new Size(217, 22);
+            MemoryManagerMenu.Text = "Gestionnaire de mémoire";
+            MemoryManagerMenu.Visible = false;
+            MemoryManagerMenu.Click += MemoryManagerMenu_Click;
             // 
             // StockageMenu
             // 
@@ -128,12 +137,12 @@
             AboutMenu.Text = "A propos...";
             AboutMenu.Click += AboutMenu_Click;
             // 
-            // MemoryManagerMenu
+            // AsmLoaderMenu
             // 
-            MemoryManagerMenu.Name = "MemoryManagerMenu";
-            MemoryManagerMenu.Size = new Size(207, 22);
-            MemoryManagerMenu.Text = "Gestionnaire de mémoire";
-            MemoryManagerMenu.Click += MemoryManagerMenu_Click;
+            AsmLoaderMenu.Name = "AsmLoaderMenu";
+            AsmLoaderMenu.Size = new Size(217, 22);
+            AsmLoaderMenu.Text = "Chargeur de code machine";
+            AsmLoaderMenu.Click += AsmLoaderMenu_Click;
             // 
             // FormMain
             // 
@@ -143,7 +152,7 @@
             Controls.Add(menuStrip1);
             IsMdiContainer = true;
             MainMenuStrip = menuStrip1;
-            Margin = new Padding(2, 2, 2, 2);
+            Margin = new Padding(2);
             Name = "FormMain";
             Text = "X07 STUDIO";
             FormClosing += FormMain_FormClosing;
@@ -174,5 +183,6 @@
         private ToolStripMenuItem Z80EditorMenu;
         private ToolStripMenuItem SettingsMenu;
         private ToolStripMenuItem MemoryManagerMenu;
+        private ToolStripMenuItem AsmLoaderMenu;
     }
 }

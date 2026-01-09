@@ -327,7 +327,7 @@ namespace x07studio.Forms
 
         private void FormProject_Shown(object sender, EventArgs e)
         {
-            Application.DoEvents();
+            CodeEditor.Refresh();
         }
 
         private void PrintMenu_Click(object sender, EventArgs e)

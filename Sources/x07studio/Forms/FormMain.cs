@@ -134,16 +134,8 @@ namespace x07studio.Forms
             SerialManager.Default.Open(Properties.Settings.Default.PortName, 4800);
         }
 
-        private async void AboutMenu_Click(object sender, EventArgs e)
+        private void AboutMenu_Click(object sender, EventArgs e)
         {
-#if DEBUG
-            var r = new Random();
-            var l = (UInt16)r.Next(100, 5000);
-            var bytes = await SerialManager.Default.GetDumpAsync(Properties.Settings.Default.PortName, 4800, 0x1000, l);
-            Debug.WriteLine($"DUMP {bytes.Length}");
-            return;
-#endif
-
             var f = new FormAbout();
             f.ShowDialog(this);
             Application.DoEvents();
@@ -152,6 +144,13 @@ namespace x07studio.Forms
         private void MemoryManagerMenu_Click(object sender, EventArgs e)
         {
             var f = new FormDump();
+            f.MdiParent = this;
+            f.Show();
+        }
+
+        private void AsmLoaderMenu_Click(object sender, EventArgs e)
+        {
+            var f = new FormAsmLoader();
             f.MdiParent = this;
             f.Show();
         }

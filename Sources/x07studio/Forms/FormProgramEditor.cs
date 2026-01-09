@@ -332,11 +332,6 @@ namespace x07studio.Forms
             StatementsComboBox.Items.AddRange(items);
         }
 
-        private void FormProgramEditor_Shown(object sender, EventArgs e)
-        {
-            Application.DoEvents();
-        }
-
         private void PrintMenu_Click(object sender, EventArgs e)
         {
             FormMain.Default.PrintDocument(CodeEditor);
