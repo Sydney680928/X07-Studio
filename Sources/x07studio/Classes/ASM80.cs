@@ -899,6 +899,68 @@ namespace x07studio.Classes
                                 return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
                             }
                         }
+                        else if (operation.Parameter == "VR")
+                        {
+                            // VR = Relative addressing for JR/DJNZ
+                            // Extract the 4-char hex address (replaced from label)
+
+                            var p = line.Substring(operation.Start.Length, 4);
+
+                            // Parse as 16-bit target address
+
+                            if (ushort.TryParse(p, System.Globalization.NumberStyles.HexNumber, null, out var targetAddr))
+                            {
+                                // Calculate instruction size (Hexa.Length / 2)
+
+                                var instructionSize = operation.HexaSize;
+
+                                // Calculate address of next instruction
+
+                                var nextInstructionAddr = (ushort)(item.Address + instructionSize);
+
+                                // Calculate relative displacement
+
+                                var displacement = (int)targetAddr - (int)nextInstructionAddr;
+
+                                // Validate range: must fit in signed 8-bit (-128 to +127)
+
+                                if (displacement < -128 || displacement > 127)
+                                {
+                                    Debug.WriteLine($"ERREUR - DEPLACEMENT RELATIF HORS LIMITES ! {displacement} - {line}");
+                                    return new AssembleResult(item.CodeLineNumber, $"DEPLACEMENT RELATIF HORS LIMITES ! ({displacement})", line);
+                                }
+
+                                // Convert to signed byte (two's complement)
+
+                                var displacementByte = (sbyte)displacement;
+
+                                // Format as 2-character hex string
+
+                                var hexDisplacement = displacementByte.ToString("X2");
+
+                                // Replace VR with calculated displacement
+
+                                var hexa = operation.Hexa.Replace("VR", hexDisplacement);
+
+                                var outLine = new OutLine(
+                                    item.Address,
+                                    i,
+                                    item.Source,
+                                    line,
+                                    hexa,
+                                    operation,
+                                    null);
+
+                                outLines[i] = outLine;
+                            }
+                            else
+                            {
+                                // Impossible de convertir la valeur hexa ---> Erreur !!!!
+
+                                Debug.WriteLine("ERREUR - PARTIE VARIABLE INCORRECTE !");
+                                return new AssembleResult(item.CodeLineNumber, "PARTIE VARIABLE INCORRECTE !", line);
+                            }
+                        }
                         else
                         {
                             // Paramètre inconnu !!!
@@ -1373,7 +1435,7 @@ namespace x07studio.Classes
 
             // DJNZ
 
-            AddDefinition("DJNZ H1H2", "10H2H1");
+            AddDefinition("DJNZ VR", "10VR");
 
             // EI
 
@@ -1469,11 +1531,11 @@ namespace x07studio.Classes
 
             // JR
 
-            AddDefinition("JR C,V0", "38V0");
-            AddDefinition("JR V0", "18V0");
-            AddDefinition("JR NC,V0", "30V0");
-            AddDefinition("JR NZ,V0", "20V0");
-            AddDefinition("JR Z,V0", "28V0");
+            AddDefinition("JR C,VR", "38VR");
+            AddDefinition("JR VR", "18VR");
+            AddDefinition("JR NC,VR", "30VR");
+            AddDefinition("JR NZ,VR", "20VR");
+            AddDefinition("JR Z,VR", "28VR");
 
             // LD
 
@@ -2287,23 +2349,38 @@ namespace x07studio.Classes
             {
                 Hexa = hexa;
 
-                // 4 paramètres possibles
+                // 5 paramètres possibles
                 // V0 = UINT8
-                // VP = INT8 
+                // VP = INT8
                 // VN = INT8
+                // VR = INT8 (Relative offset, two's complement)
                 // H1H2 = UINT16
-                
-                var k = op.IndexOf("V0");
+
+                // Check VR first (before V0 to avoid false match)
+                var k = op.IndexOf("VR");
 
                 if (k > -1)
                 {
-                    // V0
+                    // VR - Relative addressing for JR/DJNZ
 
                     WithParameters = true;
-                    Parameter = "V0";
+                    Parameter = "VR";
                     Start = op.Substring(0, k);
                     if (k + 2 < op.Length) End = op.Substring(k + 2);
                 }
+                else
+                {
+                    k = op.IndexOf("V0");
+
+                    if (k > -1)
+                    {
+                        // V0
+
+                        WithParameters = true;
+                        Parameter = "V0";
+                        Start = op.Substring(0, k);
+                        if (k + 2 < op.Length) End = op.Substring(k + 2);
+                    }
                 else
                 {
                     k = op.IndexOf("VP");
@@ -2351,6 +2428,7 @@ namespace x07studio.Classes
                             }
                         }
                     }
+                }
                 }
             }
 
