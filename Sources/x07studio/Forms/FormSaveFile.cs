@@ -37,7 +37,7 @@ namespace x07studio.Forms
                         AddExtension = true,
                         AddToRecent = true,
                         DefaultExt = "PX7",
-                        Filter = "Programmes X07|*.K7",
+                        Filter = "Programmes X07 (*.K7)|*.K7|Programmes CAS (*.CAS)|*.CAS|All Files (*.*)|*.*",
                         InitialDirectory = AppGlobal.StorageFolder
                     };
 

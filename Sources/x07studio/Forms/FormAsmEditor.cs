@@ -70,7 +70,7 @@ namespace x07studio.Forms
                             AddExtension = true,
                             AddToRecent = true,
                             DefaultExt = "Z80",
-                            Filter = "Programmes Z80|*.Z80",
+                            Filter = "Programmes Z80 (*.Z80)|*.Z80|Programmes ASM (*.ASM)|*.ASM|All Files (*.*)|*.*",
                             InitialDirectory = AppGlobal.AsmFolder
                         };
 
@@ -162,7 +162,7 @@ namespace x07studio.Forms
                     CheckFileExists = true,
                     CheckPathExists = true,
                     DefaultExt = "Z80",
-                    Filter = "Programmes Z80|*.Z80",
+                    Filter = "Programmes Z80 (*.Z80)|*.Z80|Programmes ASM (*.ASM)|*.ASM|All Files (*.*)|*.*",
                     InitialDirectory = AppGlobal.AsmFolder
                 };
 
@@ -199,7 +199,7 @@ namespace x07studio.Forms
                 AddExtension = true,
                 AddToRecent = true,
                 DefaultExt = "Z80",
-                Filter = "Programmes Z80|*.Z80",
+                Filter = "Programmes Z80 (*.Z80)|*.Z80|Programmes ASM (*.ASM)|*.ASM|All Files (*.*)|*.*",
                 InitialDirectory = AppGlobal.AsmFolder,
                 FileName = filename
             };

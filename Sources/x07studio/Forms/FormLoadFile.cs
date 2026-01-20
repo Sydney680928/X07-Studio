@@ -28,7 +28,7 @@ namespace x07studio.Forms
                 CheckFileExists = true,
                 CheckPathExists = true,
                 DefaultExt = "X07",
-                Filter = "Programmes X07|*.K7",
+                Filter = "Programmes X07 (*.K7)|*.K7|Programmes CAS (*.CAS)|*.CAS|All Files (*.*)|*.*",
                 InitialDirectory = AppGlobal.StorageFolder
             };
 
