@@ -9,7 +9,7 @@
 
 		<RuleSet ignorecase = "false">
 
-			<Delimiters>*()-+=|#/:;"&lt;&gt;,</Delimiters>
+			<Delimiters>@*()-+=|#/:;"&lt;&gt;,</Delimiters>
 			
 			<Span name = "COMMENT" bold = "false" italic = "false" color = "Gray" stopateol = "true">
 				<Begin singleword="true">REM </Begin>
@@ -38,13 +38,10 @@
                 <Begin>"</Begin>
                 <End>"</End>
             </Span>
-			
-			<Span name = "LabelUsage" bold = "false" italic = "true" color = "Green" stopateol = "true">
-				<Begin>@@</Begin>
-				<End>:</End>
-			</Span>
 
-            <KeyWords name = "basic_instructions" bold="false" italic="false" color="Blue">
+			<MarkFollowing bold="false" italic="false" color="Green">@</MarkFollowing>
+
+			<KeyWords name = "basic_instructions" bold="false" italic="false" color="Blue">
                 <Key word = "BEEP" />
                 <Key word = "CIRCLE" />
                 <Key word = "CLEAR" />
