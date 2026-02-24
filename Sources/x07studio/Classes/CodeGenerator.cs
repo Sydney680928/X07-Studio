@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static x07studio.Classes.ASM80;
 using static x07studio.Classes.CodeGenerator;
@@ -251,20 +252,20 @@ namespace x07studio.Classes
                 }
             }
 
-            // On trie les labels du plus grand au plus petit
-
-            var labelKeys = labels.Keys.ToList();
-            int labelSort(string l1, string l2) => l2.CompareTo(l1);
-            labelKeys.Sort(labelSort);
-
             // On remplace les labels dans les lignes par leur numéro de ligne
+
+            var pattern = string.Join("|", labels.Keys
+                .OrderByDescending(k => k.Length)
+                .Select(k => Regex.Escape(k) + @"\b"));
+
+            var regex = new Regex(pattern, RegexOptions.Compiled);
 
             for (int i = 0; i < exports.Count; i++)
             {
-                foreach (var key in labelKeys)
-                {
-                    exports[i].BasicLine = exports[i].BasicLine.Replace(key, labels[key].ToString());
-                }
+                exports[i].BasicLine = regex.Replace(
+                    exports[i].BasicLine,
+                    m => labels[m.Value].ToString()
+                );
             }
 
             // On remplace les définitions ASCII par les caractères correspondants
