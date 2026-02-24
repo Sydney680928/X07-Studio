@@ -33,3 +33,9 @@ You can also program in Z80 assembler <br />
 
 ![Alt text](./Images/x07_img31.jpg?raw=true "You can also program in Z80 assembler")
 ![Alt text](./Images/x07_img32.jpg?raw=true "You can also program in Z80 assembler")
+
+<br />
+
+**See the YouTube video at 23:40 for a reference to X07-STUDIO**
+
+[![See the YouTube video at 23:35 for a reference to X07-STUDIO](https://img.youtube.com/vi/w3qPUvg_FlM/maxresdefault.jpg)](https://www.youtube.com/watch?v=w3qPUvg_FlM)
