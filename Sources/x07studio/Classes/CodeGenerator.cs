@@ -254,18 +254,21 @@ namespace x07studio.Classes
 
             // On remplace les labels dans les lignes par leur numéro de ligne
 
-            var pattern = string.Join("|", labels.Keys
-                .OrderByDescending(k => k.Length)
-                .Select(k => Regex.Escape(k) + @"\b"));
-
-            var regex = new Regex(pattern, RegexOptions.Compiled);
-
-            for (int i = 0; i < exports.Count; i++)
+            if (labels.Count > 0)
             {
-                exports[i].BasicLine = regex.Replace(
-                    exports[i].BasicLine,
-                    m => labels[m.Value].ToString()
-                );
+                var pattern = string.Join("|", labels.Keys
+                    .OrderByDescending(k => k.Length)
+                    .Select(k => Regex.Escape(k) + @"\b"));
+
+                var regex = new Regex(pattern, RegexOptions.Compiled);
+
+                for (int i = 0; i < exports.Count; i++)
+                {
+                    exports[i].BasicLine = regex.Replace(
+                        exports[i].BasicLine,
+                        m => labels[m.Value].ToString()
+                    );
+                }
             }
 
             // On remplace les définitions ASCII par les caractères correspondants
